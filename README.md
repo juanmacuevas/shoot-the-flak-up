@@ -1,6 +1,7 @@
 Shoot The Flak Up 
 =================
-Simple tank shooting game for Android.
+Simple tank shooting game for Android. [Demo video on youtube](http://www.youtube.com/watch?v=OdXOmDiTjH0)
+
 This document describes the design and implementation process of a tank shooting game for the Android mobile platform. The following sections shows the features included in the game, the creation process and the software used during the task.
 
 Main Features included:
