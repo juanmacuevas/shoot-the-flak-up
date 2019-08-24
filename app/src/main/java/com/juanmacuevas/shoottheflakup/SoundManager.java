@@ -4,7 +4,6 @@ import android.content.Context;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.SoundPool;
-import com.juanmacuevas.shoottheflakup.R;
 
 public class SoundManager {
 

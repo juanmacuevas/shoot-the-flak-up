@@ -13,7 +13,6 @@ import android.os.Handler;
 import android.os.Vibrator;
 import android.util.DisplayMetrics;
 import android.view.SurfaceHolder;
-import com.juanmacuevas.shoottheflakup.R;
 
 
 public class GameThread extends Thread {
@@ -67,10 +66,10 @@ public class GameThread extends Thread {
 	private Vibrator vibrator;
 	public static DisplayMetrics displayMetrics;
 
-	public GameThread(SurfaceHolder surfaceHolder, Context context,
-			Handler handler) {
+	public GameThread(Context context,GameView surfaceView, DisplayMetrics metrics) {
 		// get handles to some important objects
-		mSurfaceHolder = surfaceHolder;
+		mSurfaceHolder = surfaceView.getHolder();
+
 		mContext = context;
 		lastUpdateTime = 0;
 		Resources res = context.getResources();
@@ -88,6 +87,9 @@ public class GameThread extends Thread {
 		aircraftDownImg= BitmapFactory.decodeResource(res,R.drawable.aircraftdown);
 		vibrator = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
 		SoundManager.loadSound(mContext);
+
+		surfaceView.setThread(this);
+		setDisplayMetrics(metrics);
 
 	}
 	/**
@@ -126,7 +128,9 @@ public class GameThread extends Thread {
 					processInput();
 					updatePhysics(delta);
 					SoundManager.update(delta);
-					doDraw(c);
+					if (c!=null) {
+                        doDraw(c);
+                    }
 				}
 			} finally {
 				// do this in a finally so that if an exception is thrown

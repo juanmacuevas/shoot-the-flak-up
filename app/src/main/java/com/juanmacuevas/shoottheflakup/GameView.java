@@ -17,21 +17,14 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 		SurfaceHolder holder = getHolder();
 		holder.addCallback(this);
 
-		// create thread only; it's started in surfaceCreated()
-
-
 		setFocusable(true); // make sure we get key events
 		setFocusableInTouchMode(true); // make sure we get touch events
 
 	}
 
-	/**
-	 * Fetches the animation thread corresponding to this GameView.
-	 * 
-	 * @return the animation thread
-	 */
-	public GameThread getThread() {
-		return thread;
+
+	public void setThread(GameThread thread) {
+		this.thread = thread;
 	}
 
 
@@ -70,21 +63,6 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
 		thread.setRunning(false);
 	}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
