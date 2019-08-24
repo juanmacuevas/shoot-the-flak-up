@@ -1,10 +1,8 @@
 package com.juanmacuevas.shoottheflakup;
 
-
-
 import java.util.concurrent.ArrayBlockingQueue;
-
 import android.app.Activity;
+import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -12,29 +10,18 @@ import android.view.Window;
 
 public class GameActivity extends Activity {
 
-
+	public static final int INPUT_QUEUE_SIZE = 30;
 	/** A handle for the thread running the game main loop */
-
 	private GameThread mGameThread;
-
 	/**A handle to the View containing the game*/
 	private GameView mGameView;
 
-	public static final int INPUT_QUEUE_SIZE = 30;
+	public final DisplayMetrics metrics = new DisplayMetrics();
+	public final ArrayBlockingQueue<InputObject> inputObjectPool = new ArrayBlockingQueue<>(INPUT_QUEUE_SIZE);
 
-	public DisplayMetrics metrics = new DisplayMetrics();
-
-	public ArrayBlockingQueue<InputObject> inputObjectPool;
-
-	/**
-	 * Invoked when the Activity is created.
-	 * 
-	 * @param savedInstanceState a Bundle containing state saved from a previous
-	 *        execution, or null if this is a new execution
-	 */
-	public void onStart() {
-		super.onStart();
-
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
 
 		// turn off the window's title bar
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -47,20 +34,17 @@ public class GameActivity extends Activity {
 
 		getWindowManager().getDefaultDisplay().getMetrics(metrics);
 
+		
 		mGameThread = mGameView.getThread();
 		mGameThread.setDisplayMetrics(metrics);
 
 		createInputObjectPool();
-
-
-
 		Log.i("metrics","density:"+ metrics.density+" DensityDPI:"+metrics.densityDpi+
 				" heightPix:"+metrics.heightPixels+" WidthPix:"+metrics.widthPixels+
 				" xReal/inch"+metrics.xdpi+" yReal/inch"+metrics.ydpi);
 	}
 
 	private void createInputObjectPool() {
-		inputObjectPool = new ArrayBlockingQueue<InputObject>(INPUT_QUEUE_SIZE);
 		for (int i = 0; i < INPUT_QUEUE_SIZE; i++) {
 			inputObjectPool.add(new InputObject(inputObjectPool));
 		}
@@ -89,7 +73,7 @@ public class GameActivity extends Activity {
 		// don't allow more than 60 motion events per second
 		try {
 			Thread.sleep(16);
-		} catch (InterruptedException e) {
+		} catch (InterruptedException e){
 		}
 		return true;
 	}

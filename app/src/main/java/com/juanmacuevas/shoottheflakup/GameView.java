@@ -1,19 +1,11 @@
 package com.juanmacuevas.shoottheflakup;
 
-
 import android.content.Context;
-
-import android.os.Bundle;
 import android.util.AttributeSet;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
 public class GameView extends SurfaceView implements SurfaceHolder.Callback {
-
-	/** Handle to the application context, used to e.g. fetch Drawables. */
-	private Context mContext;
-
-
 
 	/** The thread that actually draws the animation */
 	private GameThread thread;
@@ -25,17 +17,13 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 		SurfaceHolder holder = getHolder();
 		holder.addCallback(this);
 
-
 		// create thread only; it's started in surfaceCreated()
-		thread = new GameThread(holder, context,null);
+
 
 		setFocusable(true); // make sure we get key events
 		setFocusableInTouchMode(true); // make sure we get touch events
 
 	}
-
-
-
 
 	/**
 	 * Fetches the animation thread corresponding to this GameView.
@@ -68,6 +56,9 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 		thread.start();
 	}
 
+	public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
+	}
+
 	/*
 	 * Callback invoked when the Surface has been destroyed and must no longer
 	 * be touched. WARNING: after this method returns, the Surface/Canvas must
@@ -81,19 +72,10 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 	}
 
 
-	public void saveState(Bundle outState) {
-		// TODO Auto-generated method stub
-
-	}
 
 
 
 
-	public void surfaceChanged(SurfaceHolder holder, int format, int width,
-			int height) {
-		// TODO Auto-generated method stub
-
-	}
 
 
 
