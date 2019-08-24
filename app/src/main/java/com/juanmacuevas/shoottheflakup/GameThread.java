@@ -1,4 +1,4 @@
-package com.juanmacuevas;
+package com.juanmacuevas.shoottheflakup;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -9,13 +9,11 @@ import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
-import android.graphics.Paint;
 import android.os.Handler;
 import android.os.Vibrator;
 import android.util.DisplayMetrics;
 import android.view.SurfaceHolder;
-
-
+import com.juanmacuevas.shoottheflakup.R;
 
 
 public class GameThread extends Thread {
@@ -81,7 +79,7 @@ public class GameThread extends Thread {
 		newaircraftimer=0;
 
 		// we don't need to transform it and it's faster to draw this way
-		mBackgroundImage = BitmapFactory.decodeResource(res,R.drawable.background);
+		mBackgroundImage = BitmapFactory.decodeResource(res, R.drawable.background);
 
 		tankImg = BitmapFactory.decodeResource(res,R.drawable.tank);
 		gunBarrelImg = BitmapFactory.decodeResource(res,R.drawable.cannon);

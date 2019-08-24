@@ -1,15 +1,8 @@
-package com.juanmacuevas;
+package com.juanmacuevas.shoottheflakup;
 
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.LinearGradient;
 import android.graphics.Matrix;
 import android.graphics.Paint;
-import android.graphics.RectF;
-import android.graphics.Shader;
-import android.graphics.Paint.Style;
 import android.util.DisplayMetrics;
 
 public class FuncionalTank implements Renderable{

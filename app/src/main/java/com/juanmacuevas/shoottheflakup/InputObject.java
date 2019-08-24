@@ -1,7 +1,6 @@
-package com.juanmacuevas;
+package com.juanmacuevas.shoottheflakup;
 import java.util.concurrent.ArrayBlockingQueue;
 
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 

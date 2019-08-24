@@ -1,4 +1,4 @@
-package com.juanmacuevas;
+package com.juanmacuevas.shoottheflakup;
 
 import android.graphics.Canvas;
 import android.graphics.Color;
