@@ -12,8 +12,6 @@ public class FunctionalAircraft implements Renderable {
 
 	private static final int STATUS_OVER = 2;
 
-	private static final int AIRCRAFT_RADIUS  = 15;
-
 	private static final float AIRCRAFT_WIDTH  = (float) (127*0.35);
 
 	private static final float AIRCRAFT_HEIGHT  = (float) (134*0.35);
@@ -24,12 +22,10 @@ public class FunctionalAircraft implements Renderable {
 	private static final long TIME_EXPLODING  = 800;
 	private final float scale;
 
-	//private static final double VERTICAL_ACCELERATION = 14;
-
 	private float lowerPosition;
 
-	private static Bitmap aircraftImg;
-	private static Bitmap aircraftDownImg;
+	private Bitmap aircraftImg;
+	private Bitmap aircraftDownImg;
 
 	private long time;
 
@@ -47,15 +43,12 @@ public class FunctionalAircraft implements Renderable {
 	private int angle;
 
 	private int direction;
-	private static float acceleration;
-
-	private Paint paint;
+	private float acceleration;
 
 	private long explodingTimer;
 
-	public FunctionalAircraft(DisplayMetrics dm){
+	public FunctionalAircraft(DisplayMetrics dm,Resources res){
 		time=0;
-		paint = new Paint();
 		status = STATUS_FLYING;
 		scale = Utils.scale(dm);
 		//random values
@@ -73,13 +66,7 @@ public class FunctionalAircraft implements Renderable {
 		angle = 0;
 		iniSpeedY=(TIME_FLYING*acceleration/2)-1/TIME_FLYING;
 
-		//iniSpeedY =  (VERTICAL_ACCELERATION*0.5* Math.pow(TIME_FLYING,2))/(TIME_FLYING);
-
-		//	iniSpeedY= ((VERTICAL_ACCELERATION)* timeLowPosition);
-		//	Log.i("aircraft","creacion Vx0: "+iniSpeedX+" Vy0: "+iniSpeedY);
-
-
-
+		initResources(res);
 
 	}
 
@@ -97,11 +84,6 @@ public class FunctionalAircraft implements Renderable {
 
 	}
 	public void draw(Canvas c) {
-		// TODO Auto-generated method stub
-		/*	if (status == STATUS_BOOM)
-				paint.setColor(Color.YELLOW);
-			else paint.setColor(Color.GRAY);
-			c.drawCircle(posX, posY, AIRCRAFT_RADIUS * FuncionalTank.scale, paint);*/
 
 		Matrix m = new Matrix();
 		m.postTranslate(drawX, drawY);
@@ -139,11 +121,12 @@ public class FunctionalAircraft implements Renderable {
 			t2=(double)(explodingTimer)/1000;
 
 			posX = (float) (posX0 +  iniSpeedX*t2*direction);
-			posY = (float) (posY0 + iniSpeedY * t2 + (7/2 * Math.pow(t2,2) ));
+			posY = (float) (posY0 + iniSpeedY * t2 + (7.0/2 * Math.pow(t2,2) ));
 
 			if (explodingTimer>TIME_EXPLODING)
 				status=STATUS_OVER;
 			break;
+			default:
 		}
 
 		drawX = (float) (posX-(AIRCRAFT_WIDTH*0.375)* scale);
@@ -153,7 +136,6 @@ public class FunctionalAircraft implements Renderable {
 
 
 	public boolean isOver() {
-		// TODO Auto-generated method stub
 		return (status==STATUS_OVER);
 	}
 

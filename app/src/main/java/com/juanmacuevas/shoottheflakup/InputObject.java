@@ -5,20 +5,20 @@ import android.view.KeyEvent;
 import android.view.MotionEvent;
 
 public class InputObject {
-	public static final byte EVENT_TYPE_KEY = 1;
-	public static final byte EVENT_TYPE_TOUCH = 2;
-	public static final int ACTION_KEY_DOWN = 1;
-	public static final int ACTION_KEY_UP = 2;
-	public static final int ACTION_TOUCH_DOWN = 3;
-	public static final int ACTION_TOUCH_MOVE = 4;
-	public static final int ACTION_TOUCH_UP = 5;
-	public ArrayBlockingQueue<InputObject> pool;
-	public byte eventType;
-	public long time;
-	public int action;
-	public int keyCode;
-	public int x;
-	public int y;
+	static final byte EVENT_TYPE_KEY = 1;
+	static final byte EVENT_TYPE_TOUCH = 2;
+	static final int ACTION_KEY_DOWN = 1;
+	static final int ACTION_KEY_UP = 2;
+	static final int ACTION_TOUCH_DOWN = 3;
+	static final int ACTION_TOUCH_MOVE = 4;
+	static final int ACTION_TOUCH_UP = 5;
+	ArrayBlockingQueue<InputObject> pool;
+	byte eventType;
+	long time;
+	int action;
+	int keyCode;
+	int x;
+	int y;
 
 	public InputObject(ArrayBlockingQueue<InputObject> pool) {
 		this.pool = pool;
@@ -59,7 +59,6 @@ public class InputObject {
 		}
 		time = event.getEventTime();
 		x = (int) event.getX() ;
-		//Log.i("motion", "x: "+Float.toString(event.getRawX())+" y: "+ Float.toString(event.getRawY()) );
 		y = (int) event.getY();
 	}
 

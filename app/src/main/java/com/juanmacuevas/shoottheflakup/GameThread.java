@@ -34,8 +34,7 @@ public class GameThread extends Thread {
         readyToDraw = false;
         lastUpdateTime = 0;
 
-        mSurfaceHolder = surfaceView.getHolder();
-		surfaceView.setThread(this);
+
 
 		soundManager = new SoundManager(context);
 		vibrator = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
@@ -47,6 +46,9 @@ public class GameThread extends Thread {
 		bulletsControl = new BulletsControl(metrics);
 		aircraftsControl = new AircraftsControl(metrics,soundManager,context.getResources());
 		hud.register(tank);
+
+		mSurfaceHolder = surfaceView.getHolder();
+		surfaceView.setThread(this);
 
 
 	}

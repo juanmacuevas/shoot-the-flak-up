@@ -2,6 +2,7 @@ package com.juanmacuevas.shoottheflakup;
 
 import android.app.Activity;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.Window;
 
@@ -43,7 +44,7 @@ public class GameActivity extends Activity {
             // don't allow more than 60 motion events per second
             Thread.sleep(16);
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            Log.d("GameActivity",e.getMessage());
         }
         return true;
     }

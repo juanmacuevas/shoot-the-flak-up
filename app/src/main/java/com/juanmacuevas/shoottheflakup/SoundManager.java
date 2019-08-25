@@ -15,7 +15,6 @@ public class SoundManager {
 	private boolean movegunPlaying ;
 	private long movegunTimer;
 	private MediaPlayer musicTheme;
-	private int theme;
 
 	public SoundManager(Context context) {
 
@@ -24,7 +23,6 @@ public class SoundManager {
 		// three ref. to the sounds I need in the application
 		shoot = sounds.load(context, R.raw.shoot, 1);
 		explode = sounds.load(context, R.raw.explode, 1);
-		//theme = sounds.load(context, R.raw.theme, 1);
 		movegun = sounds.load(context, R.raw.movegun, 1);
 		movegunPlaying = false;
 		// the music that is played at the beginning and when there is only 10 seconds left in a game

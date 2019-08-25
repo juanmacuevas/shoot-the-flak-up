@@ -26,17 +26,6 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 		this.thread = thread;
 	}
 
-
-//	/**
-//	 * Standard window-focus override. Notice focus lost so we can pause on
-//	 * focus lost. e.g. user switches to take a call.
-//	 */
-//	@Override
-//	public void onWindowFocusChanged(boolean hasWindowFocus) {
-//		if (!hasWindowFocus) thread.pause();
-//	}
-//
-
 	/*
 	 * Callback invoked when the Surface has been created and is ready to be
 	 * used.

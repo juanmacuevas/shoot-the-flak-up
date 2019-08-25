@@ -47,8 +47,8 @@ public class FuncionalTank implements Renderable{
 	private long milisecondsPowering;
 	private static final long POWERING_TIMER_LIMIT = 1200;
 
-	private static float ShootOriginX;
-	private static float ShootOriginY;
+	private final float shootOriginX;
+	private final float shootOriginY;
 
 	private float tankLeft;
 	private float tankTop;
@@ -61,7 +61,6 @@ public class FuncionalTank implements Renderable{
 
 	private int power;
 
-	private Paint paint;
 	private int lastBulletPower;
 
 	private final float scale;
@@ -78,8 +77,8 @@ public class FuncionalTank implements Renderable{
 		tankLeft = TANK_LEFT_MARGIN * scale;
 		tankTop = this.metrics.heightPixels - (TANK_HEIGHT + TANK_BOTTOM_MARGIN) * scale;
 
-		ShootOriginX = TANK_LEFT_MARGIN + 60.f * scale;
-		ShootOriginY = tankTop + 12 * scale;
+		shootOriginX = TANK_LEFT_MARGIN + 60.f * scale;
+		shootOriginY = tankTop + 12 * scale;
 
 		setTarget(this.metrics.widthPixels, 0);
 
@@ -103,11 +102,7 @@ public class FuncionalTank implements Renderable{
 			if (milisecondsPowering >POWERING_TIMER_LIMIT)
 				milisecondsPowering =0;
 
-
 			power = (int) (((float) milisecondsPowering / POWERING_TIMER_LIMIT) *100);
-
-			//logarithm to improve the powering control  high values
-			//power = (int) (50 * Math.log10(power+1)); 
 		}
 	}
 
@@ -116,20 +111,10 @@ public class FuncionalTank implements Renderable{
 	 */
 	public void draw(Canvas c) {
 
-		/**	old graphic function
-		paint.setStyle(Style.STROKE);
-		paint.setStrokeCap(Paint.Cap.ROUND);
-		paint.setStrokeWidth(7*scale);
-		c.drawLine(ShootOriginX, ShootOriginY, gunBarrelEndX, gunBarrelEndY, paint);
-		 */
-
-		// c.drawBitmap(GameThread.gunBarrelImg, tankLeft, tankTop, null);
-
-
 		//draw the gun barrel
 		Matrix m = new Matrix();
 		m.postTranslate(tankLeft+40*scale, tankTop);
-		m.postRotate((float) ((-angle)*180 /Math.PI),ShootOriginX,ShootOriginY);		   
+		m.postRotate((float) ((-angle)*180 /Math.PI), shootOriginX, shootOriginY);
 		c.drawBitmap(gunBarrelImg, m, null);
 		//draw the Tank
 		c.drawBitmap(tankImg, tankLeft, tankTop, null);
@@ -142,20 +127,18 @@ public class FuncionalTank implements Renderable{
 	 */
 	public void setTarget(int x, int y) {
 		float previousAngle=angle;
-		if (x<ShootOriginX) x = (int) ShootOriginX;
-		if (y>ShootOriginY) y = (int) ShootOriginY;
-		if (x==ShootOriginX && y==ShootOriginY) x= metrics.widthPixels;
+		if (x< shootOriginX) x = (int) shootOriginX;
+		if (y> shootOriginY) y = (int) shootOriginY;
+		if (x== shootOriginX && y== shootOriginY) x= metrics.widthPixels;
 
-		angle = Math.abs((float) Math.atan((y-ShootOriginY)/(x-ShootOriginX)));
-		//Log.i("angle","x: "+x+" y: "+y+" Angulo: "+Float.toString((float) (angle*180/Math.PI)));
+		angle = Math.abs((float) Math.atan((y- shootOriginY)/(x- shootOriginX)));
 
-		gunBarrelEndX = (int) (ShootOriginX + (Math.cos(angle) * (GUNBARREL_LENGTH-30) *scale));
-		gunBarrelEndY = (int) (ShootOriginY - (Math.sin(angle) * (GUNBARREL_LENGTH-30) *scale));
+		gunBarrelEndX = (int) (shootOriginX + (Math.cos(angle) * (GUNBARREL_LENGTH-30) *scale));
+		gunBarrelEndY = (int) (shootOriginY - (Math.sin(angle) * (GUNBARREL_LENGTH-30) *scale));
 
 		int aux = Math.abs( (int) ((previousAngle-angle)*180/Math.PI));
 		if (aux>0) //only reproduces the sound when the angle changes at least one degree
 			thread.playMovegun();
-		//Log.i("angle","gunBarrelEndX: "+gunBarrelEndX+" gunBarrelEndY: "+gunBarrelEndY+" Angulo: "+Float.toString((float) (angle*180/Math.PI)));
 
 	}
 
@@ -179,20 +162,6 @@ public class FuncionalTank implements Renderable{
 
 	}
 
-
-
-
-	/**
-	 *  used to cancel the powering action
-	 *  
-
-	public void cancelFire() {
-		tankStatus = STATUS_IDLE;
-		power = 0;
-
-	}
-	 */
-	
 	/**
 	 * gives information about the power of the tank
 	 */

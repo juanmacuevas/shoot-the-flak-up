@@ -22,8 +22,6 @@ public class FunctionalBullet implements Renderable{
 	private long time;
 
 	private int status;
-	private int power;
-	private float angle;
 	private float posX0;
 	private float posY0;
 	private float posX;
@@ -40,7 +38,6 @@ public class FunctionalBullet implements Renderable{
 	public FunctionalBullet(int power,float angle,int x0,int y0, DisplayMetrics metrics){
 		time=0;
 		paint = new Paint();
-		this.power = power;
 		posX0=x0;
 		posY0 = y0;
 		iniSpeedY=(float) (Math.sin(angle)*power*1.5) ;
@@ -81,6 +78,7 @@ public class FunctionalBullet implements Renderable{
 			if (explodingTimer>TIME_EXPLODING)
 				status=STATUS_OVER;
 			break;
+			default:
 		}
 	}
 
