@@ -7,17 +7,17 @@ import android.media.SoundPool;
 
 public class SoundManager {
 
-	private static SoundPool sounds;
-	private static int shoot;
-	private static int explode;
+	private SoundPool sounds;
+	private int shoot;
+	private int explode;
 
-	private static int movegun;
-	private static boolean movegunPlaying ;
-	private static long movegunTimer;
-	private static MediaPlayer musicTheme;
-	private static int theme;
+	private int movegun;
+	private boolean movegunPlaying ;
+	private long movegunTimer;
+	private MediaPlayer musicTheme;
+	private int theme;
 
-	public static void loadSound(Context context) {
+	public SoundManager(Context context) {
 
 		//sound = context.gets // should there be sound?
 		sounds = new SoundPool(5, AudioManager.STREAM_MUSIC, 0);
@@ -34,7 +34,7 @@ public class SoundManager {
 	}
 
 
-	public static final void playMusicTheme() {
+	public final void playMusicTheme() {
 
 		if (!musicTheme.isPlaying()) {
 			musicTheme.seekTo(0);
@@ -42,23 +42,23 @@ public class SoundManager {
 		}
 	}
 
-	public static final void pauseMusic() {
+	public final void pauseMusic() {
 
 		if (musicTheme.isPlaying()) musicTheme.pause();
 	}
 
-	public static void playShoot() {
+	public void playShoot() {
 
 		sounds.play(shoot, 1, 1, 1, 0, 1);
 	}
 
-	public static void playExplode() {
+	public void playExplode() {
 
 		sounds.play(explode, 1, 1, 1, 0, 1);
 
 	}
 
-	public static void playMovegun() {
+	public void playMovegun() {
 		if (!movegunPlaying){
 			sounds.play(movegun, 1, 1, 1, 0, 1);
 			movegunPlaying = true;
@@ -71,7 +71,7 @@ public class SoundManager {
 
 	}
 
-	public static void update(long time){
+	public void update(long time){
 		playMusicTheme();
 		if (movegunPlaying){
 			movegunTimer+=time;

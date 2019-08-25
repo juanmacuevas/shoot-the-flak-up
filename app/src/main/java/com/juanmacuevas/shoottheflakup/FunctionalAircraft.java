@@ -161,7 +161,6 @@ public class FunctionalAircraft implements Renderable {
 		float diffY=Math.abs(posY-b.getPosY());
 		if (diffX<19 && diffY<19*FuncionalTank.scale){
 			impact = true;
-			SoundManager.playExplode();
 		}
 		else impact = false;			
 		return impact;

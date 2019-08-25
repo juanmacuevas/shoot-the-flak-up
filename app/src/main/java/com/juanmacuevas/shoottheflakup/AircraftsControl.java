@@ -11,8 +11,10 @@ class AircraftsControl {
     private ArrayList<FunctionalAircraft> aircrafts;
     private long newaircraftimer;
     private DisplayMetrics dm;
+    SoundManager soundManager;
 
-    public AircraftsControl(DisplayMetrics dm) {
+    public AircraftsControl(DisplayMetrics dm,SoundManager soundManager) {
+        this.soundManager = soundManager;
         aircrafts = new ArrayList<FunctionalAircraft>();
         newaircraftimer = 0;
         this.dm = dm;
@@ -36,7 +38,7 @@ class AircraftsControl {
 
             for (FunctionalBullet b : bullets) {
                 if (a.isFlying() && b.isFlying() && (a.impactDetected(b))) {
-
+                    soundManager.playExplode();
                     hud.addImpact();
                     a.setImpact();
                     b.setImpact();

@@ -9,8 +9,6 @@ import android.os.Vibrator;
 import android.util.DisplayMetrics;
 import android.view.SurfaceHolder;
 
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.concurrent.ArrayBlockingQueue;
 
 
@@ -21,6 +19,7 @@ public class GameThread extends Thread {
 	public static Bitmap gunBarrelImg;
 	public static Bitmap aircraftImg;
 	public static Bitmap aircraftDownImg;
+	private final SoundManager soundManager;
 
 	private SurfaceHolder mSurfaceHolder;
 
@@ -43,13 +42,13 @@ public class GameThread extends Thread {
         readyToDraw = false;
         mSurfaceHolder = surfaceView.getHolder();
         lastUpdateTime = 0;
+		soundManager = new SoundManager(context);
 
         bulletsControl = new BulletsControl();
-        aircraftsControl = new AircraftsControl(metrics);
+        aircraftsControl = new AircraftsControl(metrics,soundManager);
 		loadBitmaps(context.getResources());
 
 		vibrator = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
-		SoundManager.loadSound(context);
 
 		surfaceView.setThread(this);
 		setDisplayMetrics(metrics);
@@ -100,7 +99,7 @@ public class GameThread extends Thread {
 					lastUpdateTime = currentTime;
 					processInput();
 					updatePhysics(delta);
-					SoundManager.update(delta);
+					soundManager.update(delta);
 					if (c!=null) {
                         doDraw(c);
                     }
@@ -222,9 +221,15 @@ public class GameThread extends Thread {
 	public void shootBullet(float angle, int power,int x, int y) {
 
         bulletsControl.addBullet(power, angle,x,y);
-		SoundManager.playShoot();
+		soundManager.playShoot();
 	}
 
 
+	public void pauseMusic() {
+		soundManager.pauseMusic();
+	}
 
+	public void playMovegun() {
+		soundManager.playMovegun();
+	}
 }

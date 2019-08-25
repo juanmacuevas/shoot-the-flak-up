@@ -70,7 +70,7 @@ public class GameActivity extends Activity {
     protected void onStop() {
         super.onStop();
         mGameThread.setRunning(false);
-        SoundManager.pauseMusic();
+        mGameThread.pauseMusic();
     }
 
 }

@@ -162,7 +162,7 @@ public class FuncionalTank implements Renderable{
 
 		int aux = Math.abs( (int) ((previousAngle-angle)*180/Math.PI));
 		if (aux>0) //only reproduces the sound when the angle changes at least one degree
-			SoundManager.playMovegun();
+			thread.playMovegun();
 		//Log.i("angle","gunBarrelEndX: "+gunBarrelEndX+" gunBarrelEndY: "+gunBarrelEndY+" Angulo: "+Float.toString((float) (angle*180/Math.PI)));
 
 	}
