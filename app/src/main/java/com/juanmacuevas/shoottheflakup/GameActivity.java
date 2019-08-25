@@ -10,7 +10,6 @@ import java.util.concurrent.ArrayBlockingQueue;
 public class GameActivity extends Activity {
 
     public static final int INPUT_QUEUE_SIZE = 30;
-
     public final ArrayBlockingQueue<InputObject> inputObjectPool = new ArrayBlockingQueue<>(INPUT_QUEUE_SIZE);
 
     private GameThread mGameThread;
@@ -39,30 +38,32 @@ public class GameActivity extends Activity {
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        // we only care about down actions in this game.
         try {
-            // history first
-            int hist = event.getHistorySize();
-            if (hist > 0) {
-                // add from oldest to newest
-                for (int i = 0; i < hist; i++) {
-                    InputObject input = inputObjectPool.take();
-                    input.useEventHistory(event, i);
-                    mGameThread.feedInput(input);
-                }
-            }
-            // current last
-            InputObject input = inputObjectPool.take();
-            input.useEvent(event);
-            mGameThread.feedInput(input);
-        } catch (InterruptedException e) {
-        }
-        // don't allow more than 60 motion events per second
-        try {
+            processEventWithPool(event,inputObjectPool,mGameThread);
+            // don't allow more than 60 motion events per second
             Thread.sleep(16);
         } catch (InterruptedException e) {
+            e.printStackTrace();
         }
         return true;
+    }
+
+    private void processEventWithPool(MotionEvent event, ArrayBlockingQueue<InputObject> inputObjectPool, GameThread mGameThread) throws InterruptedException {
+        // we only care about down actions in this game.
+        // history first
+        int hist = event.getHistorySize();
+        if (hist > 0) {
+            // add from oldest to newest
+            for (int i = 0; i < hist; i++) {
+                InputObject input = inputObjectPool.take();
+                input.useEventHistory(event, i);
+                mGameThread.feedInput(input);
+            }
+        }
+        // current last
+        InputObject input = inputObjectPool.take();
+        input.useEvent(event);
+        mGameThread.feedInput(input);
     }
 
     @Override

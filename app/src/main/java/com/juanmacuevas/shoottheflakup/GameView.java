@@ -7,7 +7,6 @@ import android.view.SurfaceView;
 
 public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
-	/** The thread that actually draws the animation */
 	private GameThread thread;
 
 	public GameView(Context context, AttributeSet attrs) {
@@ -28,15 +27,15 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 	}
 
 
-	/**
-	 * Standard window-focus override. Notice focus lost so we can pause on
-	 * focus lost. e.g. user switches to take a call.
-	 */
-	@Override
-	public void onWindowFocusChanged(boolean hasWindowFocus) {
-		if (!hasWindowFocus) thread.pause();
-	}
-
+//	/**
+//	 * Standard window-focus override. Notice focus lost so we can pause on
+//	 * focus lost. e.g. user switches to take a call.
+//	 */
+//	@Override
+//	public void onWindowFocusChanged(boolean hasWindowFocus) {
+//		if (!hasWindowFocus) thread.pause();
+//	}
+//
 
 	/*
 	 * Callback invoked when the Surface has been created and is ready to be

@@ -3,6 +3,7 @@ package com.juanmacuevas.shoottheflakup;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.graphics.Paint;
+import android.util.DisplayMetrics;
 
 public class FunctionalAircraft implements Renderable {
 
@@ -50,7 +51,7 @@ public class FunctionalAircraft implements Renderable {
 
 	private long explodingTimer;
 
-	public FunctionalAircraft(){
+	public FunctionalAircraft(DisplayMetrics dm){
 		time=0;
 		paint = new Paint();
 		status = STATUS_FLYING;
@@ -59,13 +60,13 @@ public class FunctionalAircraft implements Renderable {
 
 		direction = (Math.random()<0.5?1:-1);
 
-		posX0 = (float) (GameThread.displayMetrics.widthPixels/2 + (GameThread.displayMetrics.widthPixels*-direction*Math.random()));
+		posX0 = (float) (dm.widthPixels/2 + (dm.widthPixels*-direction*Math.random()));
 
-		lowerPosition = GameThread.displayMetrics.heightPixels;
+		lowerPosition = dm.heightPixels;
 
 		acceleration = (float) (lowerPosition/Math.pow(TIME_FLYING/2,2));
 
-		iniSpeedX = ( GameThread.displayMetrics.widthPixels / TIME_FLYING) ;
+		iniSpeedX = ( dm.widthPixels / TIME_FLYING) ;
 
 		angle = 0;
 		iniSpeedY=(TIME_FLYING*acceleration/2)-1/TIME_FLYING;

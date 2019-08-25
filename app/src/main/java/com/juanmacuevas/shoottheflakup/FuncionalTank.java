@@ -39,6 +39,7 @@ public class FuncionalTank implements Renderable{
 	 * status of the tank while ready to shoot
 	 */
 	private static final int STATUS_POWERING=1;
+	private final GameThread thread;
 
 	//private static final int STATUS_FIRE;
 	/**
@@ -75,7 +76,8 @@ public class FuncionalTank implements Renderable{
 	private int lastBulletPower;
 	public static float scale;
 
-	public FuncionalTank(DisplayMetrics d){
+	public FuncionalTank(DisplayMetrics d,GameThread thread){
+		this.thread = thread;
 		status = STATUS_IDLE;
 		power = 0;
 		lastBulletPower= 0;
@@ -178,7 +180,7 @@ public class FuncionalTank implements Renderable{
 	 * called when the user release the finger and the shoot is performed
 	 */
 	public void releaseFire() {
-		GameThread.shootBullet(angle,40+power*60/100,gunBarrelEndX,gunBarrelEndY);	
+		thread.shootBullet(angle,40+power*60/100,gunBarrelEndX,gunBarrelEndY);
 		lastBulletPower = power;
 		status = STATUS_IDLE;
 		power = 0;
