@@ -64,11 +64,7 @@ public class FuncionalTank implements Renderable{
 	private Paint paint;
 	private int lastBulletPower;
 
-	public static float getScale() {
-		return scale;
-	}
-
-	public static float scale;
+	private final float scale;
 	private DisplayMetrics metrics;
 
 	public FuncionalTank(DisplayMetrics metrics, GameThread thread, Resources res) {
@@ -78,7 +74,7 @@ public class FuncionalTank implements Renderable{
 		lastBulletPower = 0;
 		milisecondsPowering = 0;
 		this.metrics = metrics;
-		scale = (float) this.metrics.densityDpi / 160;
+		scale = Utils.scale(metrics);
 		tankLeft = TANK_LEFT_MARGIN * scale;
 		tankTop = this.metrics.heightPixels - (TANK_HEIGHT + TANK_BOTTOM_MARGIN) * scale;
 

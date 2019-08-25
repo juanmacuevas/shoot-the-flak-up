@@ -22,7 +22,7 @@ public class FunctionalAircraft implements Renderable {
 	private static final float TIME_FLYING = 5;
 
 	private static final long TIME_EXPLODING  = 800;
-	private final float scale=FuncionalTank.scale;
+	private final float scale;
 
 	//private static final double VERTICAL_ACCELERATION = 14;
 
@@ -57,7 +57,7 @@ public class FunctionalAircraft implements Renderable {
 		time=0;
 		paint = new Paint();
 		status = STATUS_FLYING;
-
+		scale = Utils.scale(dm);
 		//random values
 
 		direction = (Math.random()<0.5?1:-1);

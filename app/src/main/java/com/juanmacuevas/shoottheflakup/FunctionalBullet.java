@@ -3,7 +3,7 @@ package com.juanmacuevas.shoottheflakup;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-
+import android.util.DisplayMetrics;
 
 
 public class FunctionalBullet implements Renderable{
@@ -19,10 +19,6 @@ public class FunctionalBullet implements Renderable{
 
 	private static final long TIME_EXPLODING  = 100;
 
-
-
-
-
 	private long time;
 
 	private int status;
@@ -36,31 +32,30 @@ public class FunctionalBullet implements Renderable{
 	private float iniSpeedY;
 	private final float tankBottom;
 	private Paint paint;
+	private final float scale;
 
 	private long explodingTimer;
 
 
-
-	public FunctionalBullet(int power,float angle,int x0,int y0, float tankBottom){
+	public FunctionalBullet(int power,float angle,int x0,int y0, DisplayMetrics metrics){
 		time=0;
 		paint = new Paint();
 		this.power = power;
 		posX0=x0;
 		posY0 = y0;
-		//if (power<15) power=15;
 		iniSpeedY=(float) (Math.sin(angle)*power*1.5) ;
 		iniSpeedX=(float) (Math.cos(angle)*power*1.5);
 
-		this.tankBottom = tankBottom;
+		this.tankBottom = metrics.heightPixels - (FuncionalTank.TANK_BOTTOM_MARGIN * Utils.scale(metrics));
+		scale = Utils.scale(metrics);
 
 	}
 
 	public void draw(Canvas c) {
-		// TODO Auto-generated method stub
 		if (status == STATUS_FLYING)
 			paint.setColor(Color.BLACK);
 		else paint.setColor(Color.RED);
-		c.drawCircle(posX, posY, BULLET_RADIUS * FuncionalTank.scale, paint);
+		c.drawCircle(posX, posY, BULLET_RADIUS * scale, paint);
 
 	}
 
@@ -69,7 +64,6 @@ public class FunctionalBullet implements Renderable{
 		case STATUS_FLYING:
 			time+=elapsedTime;
 			double t2=(double)(time)/100;
-			// TODO Auto-generated method stub
 			posX=(float) (posX0 + iniSpeedX*t2);
 			posY=(float) (posY0 - (iniSpeedY*t2 - (9.8 *Math.pow(t2, 2)/2)));
 
@@ -91,33 +85,29 @@ public class FunctionalBullet implements Renderable{
 	}
 
 	public boolean isExploding() {
-		// TODO Auto-generated method stub
-		return (status==STATUS_BOOM);
+		return (status == STATUS_BOOM);
 	}
 
 	public boolean isOver() {
-		// TODO Auto-generated method stub
-		return (status==STATUS_OVER);
+		return (status == STATUS_OVER);
 	}
 
-	public void setImpact(){
+	public void setImpact() {
 
 		status = STATUS_BOOM;
-		explodingTimer=0;
+		explodingTimer = 0;
 	}
 
 	public float getPosX() {
-		// TODO Auto-generated method stub
 		return posX;
 	}
 
 	public float getPosY() {
-		// TODO Auto-generated method stub
 		return posY;
 	}
 
 
-	public boolean isFlying(){
+	public boolean isFlying() {
 		return (status == STATUS_FLYING);
 	}
 

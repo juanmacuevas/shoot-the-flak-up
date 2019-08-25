@@ -43,8 +43,8 @@ public class GameThread extends Thread {
 		tank = new FuncionalTank(metrics,this,context.getResources());
 		landscape = new Landscape(context.getResources(),metrics);
 		hud = new HUD(metrics);
-		float tankBottom = metrics.heightPixels - (FuncionalTank.TANK_BOTTOM_MARGIN * FuncionalTank.scale);
-		bulletsControl = new BulletsControl(tankBottom);
+
+		bulletsControl = new BulletsControl(metrics);
 		aircraftsControl = new AircraftsControl(metrics,soundManager,context.getResources());
 		hud.register(tank);
 
