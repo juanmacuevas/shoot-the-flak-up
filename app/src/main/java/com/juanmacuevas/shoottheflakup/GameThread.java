@@ -6,6 +6,7 @@ import android.os.Vibrator;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.SurfaceHolder;
+import androidx.core.util.Pair;
 
 import java.util.concurrent.ArrayBlockingQueue;
 
@@ -169,9 +170,9 @@ public class GameThread extends Thread {
 		}
 	}
 
-	public void shootBullet(float angle, int power,int x, int y) {
+	public void shootBullet(float angle, int power,Pair<Integer, Integer> bulletOrigin) {
 
-        bulletsControl.addBullet(power, angle,x,y);
+        bulletsControl.addBullet(power, angle, bulletOrigin);
 		soundManager.playShoot();
 	}
 
@@ -183,4 +184,5 @@ public class GameThread extends Thread {
 	public void playMovegun() {
 		soundManager.playMovegun();
 	}
+
 }

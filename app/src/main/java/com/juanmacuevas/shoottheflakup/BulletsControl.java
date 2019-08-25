@@ -2,6 +2,7 @@ package com.juanmacuevas.shoottheflakup;
 
 import android.graphics.Canvas;
 import android.util.DisplayMetrics;
+import androidx.core.util.Pair;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -39,8 +40,8 @@ class BulletsControl {
         }
     }
 
-    public void addBullet(int power, float angle, int x, int y) {
-        bullets.add(new FunctionalBullet(power, angle,x,y,metrics));
+    public void addBullet(int power, float angle, Pair<Integer, Integer> bulletOrigin) {
+        bullets.add(new FunctionalBullet(power, angle,bulletOrigin,metrics));
 
     }
 

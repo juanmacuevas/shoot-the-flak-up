@@ -4,6 +4,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.util.DisplayMetrics;
+import androidx.core.util.Pair;
 
 
 public class FunctionalBullet implements Renderable{
@@ -35,11 +36,11 @@ public class FunctionalBullet implements Renderable{
 	private long explodingTimer;
 
 
-	public FunctionalBullet(int power,float angle,int x0,int y0, DisplayMetrics metrics){
+	public FunctionalBullet(int power, float angle, Pair<Integer, Integer> bulletOrigin, DisplayMetrics metrics){
 		time=0;
 		paint = new Paint();
-		posX0=x0;
-		posY0 = y0;
+		posX0=bulletOrigin.first;
+		posY0 = bulletOrigin.second;
 		iniSpeedY=(float) (Math.sin(angle)*power*1.5) ;
 		iniSpeedX=(float) (Math.cos(angle)*power*1.5);
 
