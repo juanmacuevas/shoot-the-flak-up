@@ -9,19 +9,19 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 class AircraftsControl {
+    private SoundManager soundManager;
     private ArrayList<FunctionalAircraft> aircrafts;
     private long newaircraftimer;
     private DisplayMetrics dm;
     private Resources res;
-    SoundManager soundManager;
 
     public AircraftsControl(DisplayMetrics dm, SoundManager soundManager, Resources res) {
         this.soundManager = soundManager;
         aircrafts = new ArrayList<>();
         newaircraftimer = 0;
         this.dm = dm;
-        this.res=res;
-        new FunctionalAircraft(dm,res);
+        this.res = res;
+        new FunctionalAircraft(dm, res);
 
     }
 
@@ -46,7 +46,7 @@ class AircraftsControl {
                     hud.addImpact();
                     a.setImpact();
                     b.setImpact();
-                    newList.add(new FunctionalAircraft(dm,res));
+                    newList.add(new FunctionalAircraft(dm, res));
 
                     // Vibrate for 300 milliseconds
                     vibrator.vibrate(100);
@@ -59,7 +59,7 @@ class AircraftsControl {
         aircrafts = newList;
         newaircraftimer += timer;
         if (newaircraftimer > 3000) {
-            aircrafts.add(new FunctionalAircraft(dm,res));
+            aircrafts.add(new FunctionalAircraft(dm, res));
             newaircraftimer = 0;
         }
 
