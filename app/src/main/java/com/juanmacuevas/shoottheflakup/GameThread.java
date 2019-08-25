@@ -1,31 +1,22 @@
 package com.juanmacuevas.shoottheflakup;
 
 import android.content.Context;
-import android.content.res.Resources;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.os.Vibrator;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.SurfaceHolder;
 
 import java.util.concurrent.ArrayBlockingQueue;
 
-
 public class GameThread extends Thread {
 
-	public static Bitmap mBackgroundImage;
-	public static Bitmap tankImg;
-	public static Bitmap gunBarrelImg;
-	public static Bitmap aircraftImg;
-	public static Bitmap aircraftDownImg;
 	private final SoundManager soundManager;
 
 	private SurfaceHolder mSurfaceHolder;
 
 	private ArrayBlockingQueue<InputObject> inputQueue = new ArrayBlockingQueue<>(30);
 	private Object inputQueueMutex = new Object();
-
 
     private boolean readyToDraw;
 
@@ -36,43 +27,30 @@ public class GameThread extends Thread {
 	private long lastUpdateTime;
 	private Vibrator vibrator;
     private BulletsControl bulletsControl;
+	private Landscape landscape;
 
-    public GameThread(Context context, GameView surfaceView, DisplayMetrics metrics) {
+	public GameThread(Context context, GameView surfaceView, DisplayMetrics metrics) {
         // get handles to some important objects
         readyToDraw = false;
-        mSurfaceHolder = surfaceView.getHolder();
         lastUpdateTime = 0;
+
+        mSurfaceHolder = surfaceView.getHolder();
+		surfaceView.setThread(this);
+
 		soundManager = new SoundManager(context);
-
-        bulletsControl = new BulletsControl();
-        aircraftsControl = new AircraftsControl(metrics,soundManager);
-		loadBitmaps(context.getResources());
-
 		vibrator = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
 
-		surfaceView.setThread(this);
-		setDisplayMetrics(metrics);
+		tank = new FuncionalTank(metrics,this,context.getResources());
+		landscape = new Landscape(context.getResources(),metrics);
+		hud = new HUD(metrics);
+		float tankBottom = metrics.heightPixels - (FuncionalTank.TANK_BOTTOM_MARGIN * FuncionalTank.scale);
+		bulletsControl = new BulletsControl(tankBottom);
+		aircraftsControl = new AircraftsControl(metrics,soundManager,context.getResources());
+		hud.register(tank);
+
 
 	}
 
-	private static void loadBitmaps(Resources res) {
-		// we don't need to transform it and it's faster to draw this way
-		mBackgroundImage = BitmapFactory.decodeResource(res, R.drawable.background);
-
-		tankImg = BitmapFactory.decodeResource(res,R.drawable.tank);
-		gunBarrelImg = BitmapFactory.decodeResource(res,R.drawable.cannon);
-
-		aircraftImg= BitmapFactory.decodeResource(res,R.drawable.aircraft);
-		aircraftDownImg= BitmapFactory.decodeResource(res,R.drawable.aircraftdown);
-	}
-
-	/**
-	 * Starts the game
-	 */
-	public void doStart() {
-		synchronized (mSurfaceHolder) {
-		}
-	}
 
 	/**
 	 * Resumes from a pause.
@@ -95,7 +73,7 @@ public class GameThread extends Thread {
 				c = mSurfaceHolder.lockCanvas(null);
 				synchronized (mSurfaceHolder) {
 					long currentTime = System.currentTimeMillis();
-					long delta = (long) (currentTime - lastUpdateTime);
+					long delta = currentTime - lastUpdateTime;
 					lastUpdateTime = currentTime;
 					processInput();
 					updatePhysics(delta);
@@ -104,6 +82,8 @@ public class GameThread extends Thread {
                         doDraw(c);
                     }
 				}
+			} catch (InterruptedException e) {
+				Log.d("GameThread",e.getMessage());
 			} finally {
 				// do this in a finally so that if an exception is thrown
 				// during the above, we don't leave the Surface in an
@@ -138,7 +118,7 @@ public class GameThread extends Thread {
 	 */
 	private void doDraw(Canvas canvas) {
 
-		canvas.drawBitmap(mBackgroundImage, 0, 0, null);
+		landscape.draw(canvas);
         aircraftsControl.draw(canvas);
         bulletsControl.draw(canvas);
 		tank.draw(canvas);
@@ -147,46 +127,28 @@ public class GameThread extends Thread {
 	}
 
 	private void updatePhysics(long timer) {
-
 	    tank.update(timer);
 	    bulletsControl.update(timer);
         aircraftsControl.update(timer,bulletsControl.iterable(),hud,vibrator);
-
-        //hud.update(timer);
-
     }
 
 
-	public void feedInput(InputObject input) {
+	public void feedInput(InputObject input) throws InterruptedException {
 		synchronized(inputQueueMutex) {
-			try {
 				inputQueue.put(input);
-			} catch (InterruptedException e) {
-				//Log.e(TAG, e.getMessage(), e);
-			}
 		}
 	}
 
-	private void processInput() {
-		synchronized(inputQueueMutex) {
-			ArrayBlockingQueue<InputObject> inputQueue = this.inputQueue;
+	private void processInput() throws InterruptedException {
+		synchronized (inputQueueMutex) {
 			while (!inputQueue.isEmpty()) {
-				try {
-					InputObject input = inputQueue.take();
+				InputObject input = inputQueue.take();
 
-					if (input.eventType == InputObject.EVENT_TYPE_TOUCH) {
-						processMotionEvent(input);
-					}
-
-					/*	else if (input.eventType == InputObject.EVENT_TYPE_KEY) {
-    					processKeyEvent(input);
-    				} else 
-					 */
-
-					input.returnToPool();
-				} catch (InterruptedException e) {
-					//Log.e(TAG, e.getMessage(), e);
+				if (input.eventType == InputObject.EVENT_TYPE_TOUCH) {
+					processMotionEvent(input);
 				}
+
+				input.returnToPool();
 			}
 		}
 	}
@@ -203,19 +165,6 @@ public class GameThread extends Thread {
 			tank.setTarget(input.x, input.y);
 			tank.releaseFire();
 		}
-	}
-
-
-
-	private void setDisplayMetrics(DisplayMetrics displayMetrics) {
-
-		mBackgroundImage=mBackgroundImage.createScaledBitmap(
-				mBackgroundImage, displayMetrics.widthPixels, displayMetrics.heightPixels, true);
-		hud = new HUD(displayMetrics);
-		tank = new FuncionalTank(displayMetrics,this);
-		hud.register(tank);
-
-
 	}
 
 	public void shootBullet(float angle, int power,int x, int y) {

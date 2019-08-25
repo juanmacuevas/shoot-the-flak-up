@@ -20,6 +20,9 @@ public class FunctionalBullet implements Renderable{
 	private static final long TIME_EXPLODING  = 100;
 
 
+
+
+
 	private long time;
 
 	private int status;
@@ -31,12 +34,14 @@ public class FunctionalBullet implements Renderable{
 	private float posY;
 	private float iniSpeedX;
 	private float iniSpeedY;
-
+	private final float tankBottom;
 	private Paint paint;
 
 	private long explodingTimer;
 
-	public FunctionalBullet(int power,float angle,int x0,int y0){
+
+
+	public FunctionalBullet(int power,float angle,int x0,int y0, float tankBottom){
 		time=0;
 		paint = new Paint();
 		this.power = power;
@@ -45,6 +50,8 @@ public class FunctionalBullet implements Renderable{
 		//if (power<15) power=15;
 		iniSpeedY=(float) (Math.sin(angle)*power*1.5) ;
 		iniSpeedX=(float) (Math.cos(angle)*power*1.5);
+
+		this.tankBottom = tankBottom;
 
 	}
 
@@ -66,10 +73,10 @@ public class FunctionalBullet implements Renderable{
 			posX=(float) (posX0 + iniSpeedX*t2);
 			posY=(float) (posY0 - (iniSpeedY*t2 - (9.8 *Math.pow(t2, 2)/2)));
 
-			if (posY>FuncionalTank.tankBottom) {
+			if (posY>tankBottom) {
 
 				status=STATUS_BOOM;
-				posY = FuncionalTank.tankBottom;
+				posY = tankBottom;
 				explodingTimer = 0;
 
 			}

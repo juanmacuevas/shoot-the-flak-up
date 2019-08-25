@@ -1,8 +1,7 @@
 package com.juanmacuevas.shoottheflakup;
 
-import android.graphics.Canvas;
-import android.graphics.Matrix;
-import android.graphics.Paint;
+import android.content.res.Resources;
+import android.graphics.*;
 import android.util.DisplayMetrics;
 
 public class FunctionalAircraft implements Renderable {
@@ -23,11 +22,14 @@ public class FunctionalAircraft implements Renderable {
 	private static final float TIME_FLYING = 5;
 
 	private static final long TIME_EXPLODING  = 800;
+	private final float scale=FuncionalTank.scale;
 
 	//private static final double VERTICAL_ACCELERATION = 14;
 
 	private float lowerPosition;
 
+	private static Bitmap aircraftImg;
+	private static Bitmap aircraftDownImg;
 
 	private long time;
 
@@ -75,14 +77,25 @@ public class FunctionalAircraft implements Renderable {
 
 		//	iniSpeedY= ((VERTICAL_ACCELERATION)* timeLowPosition);
 		//	Log.i("aircraft","creacion Vx0: "+iniSpeedX+" Vy0: "+iniSpeedY);
-		float scale = FuncionalTank.scale;
 
-		GameThread.aircraftImg=GameThread.aircraftImg.createScaledBitmap(GameThread.aircraftImg,(int) (AIRCRAFT_WIDTH*scale),(int) (AIRCRAFT_HEIGHT*scale), true);
-		GameThread.aircraftDownImg=GameThread.aircraftDownImg.createScaledBitmap(GameThread.aircraftDownImg,(int) (AIRCRAFT_WIDTH*scale),(int) (AIRCRAFT_HEIGHT*scale), true);
+
 
 
 	}
 
+	public void initResources(Resources res){
+        if (aircraftDownImg == null) {
+            aircraftDownImg = BitmapFactory.decodeResource(res, R.drawable.aircraftdown);
+            aircraftDownImg = Bitmap.createScaledBitmap(aircraftDownImg, (int) (AIRCRAFT_WIDTH * scale), (int) (AIRCRAFT_HEIGHT * scale), true);
+        }
+        if (aircraftImg == null) {
+            aircraftImg = BitmapFactory.decodeResource(res, R.drawable.aircraft);
+            aircraftImg = Bitmap.createScaledBitmap(aircraftImg, (int) (AIRCRAFT_WIDTH * scale), (int) (AIRCRAFT_HEIGHT * scale), true);
+        }
+
+
+
+	}
 	public void draw(Canvas c) {
 		// TODO Auto-generated method stub
 		/*	if (status == STATUS_BOOM)
@@ -94,10 +107,10 @@ public class FunctionalAircraft implements Renderable {
 		m.postTranslate(drawX, drawY);
 		m.postRotate(angle,posX,posY);
 
-		if (status == STATUS_FLYING) 
-			c.drawBitmap(GameThread.aircraftImg, m, null);
-		else if (status == STATUS_BOOM) 
-			c.drawBitmap(GameThread.aircraftDownImg, m, null);
+		if (status == STATUS_FLYING)
+			c.drawBitmap(aircraftImg, m, null);
+		else if (status == STATUS_BOOM)
+			c.drawBitmap(aircraftDownImg, m, null);
 
 	}
 
@@ -105,7 +118,7 @@ public class FunctionalAircraft implements Renderable {
 
 
 		double t2;
-		switch (status){		
+		switch (status){
 		case STATUS_FLYING:
 			time+=elapsedTime;
 			t2=(double)(time)/1000;
@@ -123,18 +136,18 @@ public class FunctionalAircraft implements Renderable {
 		case STATUS_BOOM:
 			explodingTimer+=elapsedTime;
 
-			t2=(double)(explodingTimer)/1000;			
+			t2=(double)(explodingTimer)/1000;
 
 			posX = (float) (posX0 +  iniSpeedX*t2*direction);
-			posY = (float) (posY0 + iniSpeedY * t2 + (7/2 * Math.pow(t2,2) ));				
+			posY = (float) (posY0 + iniSpeedY * t2 + (7/2 * Math.pow(t2,2) ));
 
 			if (explodingTimer>TIME_EXPLODING)
 				status=STATUS_OVER;
 			break;
 		}
 
-		drawX = (float) (posX-(AIRCRAFT_WIDTH*0.375)*FuncionalTank.scale);
-		drawY = posY-(AIRCRAFT_HEIGHT/2)*FuncionalTank.scale;
+		drawX = (float) (posX-(AIRCRAFT_WIDTH*0.375)* scale);
+		drawY = posY-(AIRCRAFT_HEIGHT/2)* scale;
 	}
 
 
@@ -150,7 +163,7 @@ public class FunctionalAircraft implements Renderable {
 		explodingTimer=0;
 		posX0=posX;
 		posY0=posY;
-		iniSpeedY=iniSpeedY-(acceleration*explodingTimer/1000); 
+		iniSpeedY=iniSpeedY-(acceleration*explodingTimer/1000);
 
 
 	}
@@ -159,10 +172,10 @@ public class FunctionalAircraft implements Renderable {
 		boolean impact = false;
 		float diffX=Math.abs(posX-b.getPosX());
 		float diffY=Math.abs(posY-b.getPosY());
-		if (diffX<19 && diffY<19*FuncionalTank.scale){
+		if (diffX<19 && diffY<19* scale){
 			impact = true;
 		}
-		else impact = false;			
+		else impact = false;
 		return impact;
 	}
 

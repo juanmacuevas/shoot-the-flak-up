@@ -6,10 +6,12 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 class BulletsControl {
+    private final float tankBottom;
     private ArrayList<FunctionalBullet> bullets;
 
-    public BulletsControl() {
+    public BulletsControl(float tankBottom) {
         bullets = new ArrayList<>();
+        this.tankBottom = tankBottom;
     }
 
     public void draw(Canvas canvas) {
@@ -36,7 +38,7 @@ class BulletsControl {
     }
 
     public void addBullet(int power, float angle, int x, int y) {
-        bullets.add(new FunctionalBullet(power, angle,x,y));
+        bullets.add(new FunctionalBullet(power, angle,x,y,tankBottom));
 
     }
 

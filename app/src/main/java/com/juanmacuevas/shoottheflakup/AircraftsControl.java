@@ -1,5 +1,6 @@
 package com.juanmacuevas.shoottheflakup;
 
+import android.content.res.Resources;
 import android.graphics.Canvas;
 import android.os.Vibrator;
 import android.util.DisplayMetrics;
@@ -13,11 +14,12 @@ class AircraftsControl {
     private DisplayMetrics dm;
     SoundManager soundManager;
 
-    public AircraftsControl(DisplayMetrics dm,SoundManager soundManager) {
+    public AircraftsControl(DisplayMetrics dm, SoundManager soundManager, Resources res) {
         this.soundManager = soundManager;
-        aircrafts = new ArrayList<FunctionalAircraft>();
+        aircrafts = new ArrayList<>();
         newaircraftimer = 0;
         this.dm = dm;
+        new FunctionalAircraft(dm).initResources(res);
 
     }
 
