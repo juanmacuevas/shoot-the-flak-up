@@ -78,7 +78,8 @@ public class FuncionalTank extends GraphicComponent {
      * @param x
      * @param y
      */
-    public void setTarget(int x, int y) {
+    public void
+    setTarget(int x, int y) {
 
         if (x < shootOriginX) x = (int) shootOriginX;
         if (y > shootOriginY) y = (int) shootOriginY;
@@ -90,7 +91,7 @@ public class FuncionalTank extends GraphicComponent {
         bulletOrigin = calculateBulletOrigin();
 
         if (angleChanged(previousAngle, angle)) {
-            thread.angleChanged();
+            thread.angleChanged(angle);
         }
 
     }

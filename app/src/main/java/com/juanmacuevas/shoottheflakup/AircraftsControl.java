@@ -2,7 +2,6 @@ package com.juanmacuevas.shoottheflakup;
 
 import android.content.res.Resources;
 import android.graphics.Canvas;
-import android.os.Vibrator;
 import android.util.DisplayMetrics;
 
 import java.util.ArrayList;

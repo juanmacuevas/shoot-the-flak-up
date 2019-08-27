@@ -9,12 +9,10 @@ import android.util.DisplayMetrics;
 abstract class GraphicComponent implements Renderable {
 
     private final Resources res;
-    private final DisplayMetrics metrics;
     protected final float scale;
 
     public GraphicComponent(Resources res, DisplayMetrics metrics) {
         this.res = res;
-        this.metrics = metrics;
         scale = Utils.scale(metrics);
     }
 

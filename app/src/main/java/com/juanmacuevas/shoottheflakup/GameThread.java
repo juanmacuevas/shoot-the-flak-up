@@ -21,7 +21,8 @@ public class GameThread extends Thread implements GameEvents{
 
     private boolean readyToDraw;
 
-	private HUD hud;
+	private PowerBar powerBar;
+	private InfoText infoText;
 	private FuncionalTank tank;
 
 	private AircraftsControl aircraftsControl;
@@ -29,6 +30,8 @@ public class GameThread extends Thread implements GameEvents{
 	private Vibrator vibrator;
     private BulletsControl bulletsControl;
 	private Landscape landscape;
+
+	private final GameData gameData = new GameData();
 
 	public GameThread(Context context, GameView surfaceView, DisplayMetrics metrics) {
         // get handles to some important objects
@@ -41,11 +44,12 @@ public class GameThread extends Thread implements GameEvents{
 		Resources res = context.getResources();
 		tank = new FuncionalTank(metrics,this,res);
 		landscape = new Landscape(res,metrics);
-		hud = new HUD(metrics);
+		powerBar = new PowerBar(metrics);
+		infoText = new InfoText(res,metrics);
 
 		bulletsControl = new BulletsControl(res,metrics);
 		aircraftsControl = new AircraftsControl(res,metrics,this);
-		hud.register(tank);
+
 
 		mSurfaceHolder = surfaceView.getHolder();
 		surfaceView.setThread(this);
@@ -111,7 +115,8 @@ public class GameThread extends Thread implements GameEvents{
         aircraftsControl.draw(canvas);
         bulletsControl.draw(canvas);
 		tank.draw(canvas);
-		hud.draw(canvas);
+		powerBar.draw(canvas);
+		infoText.draw(canvas);
 
 	}
 
@@ -119,6 +124,11 @@ public class GameThread extends Thread implements GameEvents{
 	    tank.update(timer);
 	    bulletsControl.update(timer);
         aircraftsControl.update(timer,bulletsControl.iterable());
+
+        gameData.setPower(tank.getPower());
+
+		powerBar.setData(gameData);
+		infoText.setData(gameData);
     }
 
 
@@ -169,15 +179,15 @@ public class GameThread extends Thread implements GameEvents{
 	}
 
 	@Override
-	public void angleChanged() {
+	public void angleChanged(float angle) {
+		gameData.setAngle(angle);
 		soundManager.playMovegun();
 	}
 
 	@Override
 	public void aircraftExploded() {
+		gameData.setImpacts(gameData.getImpacts()+1);
 		soundManager.playExplode();
-		// Vibrate for 300 milliseconds
 		vibrator.vibrate(100);
-		hud.addImpact();
 	}
 }
