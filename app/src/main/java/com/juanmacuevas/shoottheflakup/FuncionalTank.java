@@ -7,7 +7,7 @@ import android.graphics.Matrix;
 import android.util.DisplayMetrics;
 import androidx.core.util.Pair;
 
-public class FuncionalTank implements Renderable {
+public class FuncionalTank extends GraphicComponent {
     public static final int TANK_BOTTOM_MARGIN = 7;
     private static final int TANK_LEFT_MARGIN = 0;
     private static final int TANK_HEIGHT = 55;
@@ -20,41 +20,38 @@ public class FuncionalTank implements Renderable {
     private static final int STATUS_POWERING = 1;
     private static final long POWERING_TIMER_LIMIT = 1200;
 
-    private final GameThread thread;
-    private final Bitmap tankImg;
-    private final Bitmap gunBarrelImg;
+    private static Bitmap tankImg;
+    private static Bitmap gunBarrelImg;
+
+    private final GameEvents thread;
     private final float shootOriginX;
     private final float shootOriginY;
-    private final float scale;
+    private final float tankLeft;
+    private final float tankTop;
 
     private int tankStatus;
     private long milisecondsPowering;
-    private float tankLeft;
-    private float tankTop;
     private Pair<Integer, Integer> bulletOrigin;
     private float angle;
     private int power;
     private int lastBulletPower;
-    private DisplayMetrics metrics;
 
     public FuncionalTank(DisplayMetrics metrics, GameThread thread, Resources res) {
+        super(res,metrics);
         this.thread = thread;
         tankStatus = STATUS_IDLE;
         power = 0;
         lastBulletPower = 0;
         milisecondsPowering = 0;
-        this.metrics = metrics;
-        scale = Utils.scale(metrics);
         tankLeft = TANK_LEFT_MARGIN * scale;
-        tankTop = this.metrics.heightPixels - (TANK_HEIGHT + TANK_BOTTOM_MARGIN) * scale;
-
+        tankTop = metrics.heightPixels - (TANK_HEIGHT + TANK_BOTTOM_MARGIN) * scale;
         shootOriginX = TANK_LEFT_MARGIN + 60.f * scale;
         shootOriginY = tankTop + 12 * scale;
+        setTarget(metrics.widthPixels, 0);
 
-        setTarget(this.metrics.widthPixels, 0);
+        tankImg = initBitmap(tankImg, R.drawable.tank, TANK_WIDTH, TANK_HEIGHT);
+        gunBarrelImg =initBitmap(gunBarrelImg, R.drawable.cannon, GUNBARREL_LENGTH, GUNBARREL_WIDTH);
 
-        tankImg = Utils.loadBitmap(res, R.drawable.tank, TANK_WIDTH, TANK_HEIGHT, scale);
-        gunBarrelImg = Utils.loadBitmap(res, R.drawable.cannon, GUNBARREL_LENGTH, GUNBARREL_WIDTH, scale);
     }
 
     public void update(long elapsedTime) {
@@ -67,16 +64,10 @@ public class FuncionalTank implements Renderable {
         }
     }
 
-    /**
-     * draw the tank in the canvas surface
-     */
+
     public void draw(Canvas c) {
-        //draw the gun barrel
-        Matrix m = new Matrix();
-        m.postTranslate(tankLeft + 40 * scale, tankTop);
-        m.postRotate((float) ((-angle) * 180 / Math.PI), shootOriginX, shootOriginY);
+        Matrix m = matrixTranslateAndMove(tankLeft + 40 * scale, tankTop, (float) ((-angle) * 180 / Math.PI), shootOriginX, shootOriginY);
         c.drawBitmap(gunBarrelImg, m, null);
-        //draw the Tank
         c.drawBitmap(tankImg, tankLeft, tankTop, null);
 
     }
@@ -91,7 +82,7 @@ public class FuncionalTank implements Renderable {
 
         if (x < shootOriginX) x = (int) shootOriginX;
         if (y > shootOriginY) y = (int) shootOriginY;
-        if (x == shootOriginX && y == shootOriginY) x = metrics.widthPixels;
+        if (x == shootOriginX && y == shootOriginY) x = x+10;
 
         final float previousAngle = angle;
         angle = calculateAngle(x, y);
@@ -99,7 +90,7 @@ public class FuncionalTank implements Renderable {
         bulletOrigin = calculateBulletOrigin();
 
         if (angleChanged(previousAngle, angle)) {
-            thread.playMovegun();
+            thread.angleChanged();
         }
 
     }

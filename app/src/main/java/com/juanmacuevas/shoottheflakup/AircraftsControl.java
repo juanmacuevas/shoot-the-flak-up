@@ -9,19 +9,19 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 class AircraftsControl {
-    private SoundManager soundManager;
+    private GameEvents gameControl;
     private ArrayList<FunctionalAircraft> aircrafts;
     private long newaircraftimer;
     private DisplayMetrics dm;
     private Resources res;
 
-    public AircraftsControl(DisplayMetrics dm, SoundManager soundManager, Resources res) {
-        this.soundManager = soundManager;
+    public AircraftsControl(Resources res,DisplayMetrics dm, GameEvents gameControl) {
+        this.gameControl = gameControl;
         aircrafts = new ArrayList<>();
         newaircraftimer = 0;
         this.dm = dm;
         this.res = res;
-        new FunctionalAircraft(dm, res);
+        new FunctionalAircraft(res,dm);
 
     }
 
@@ -33,8 +33,7 @@ class AircraftsControl {
         }
     }
 
-    public void update(long timer, Iterable<FunctionalBullet> bullets, HUD
-            hud, Vibrator vibrator) {
+    public void update(long timer, Iterable<FunctionalBullet> bullets) {
         ArrayList<FunctionalAircraft> newList = new ArrayList<>();
         for (FunctionalAircraft a : aircrafts) {
             if (a.isOver()) continue;
@@ -42,14 +41,11 @@ class AircraftsControl {
 
             for (FunctionalBullet b : bullets) {
                 if (a.isFlying() && b.isFlying() && (a.impactDetected(b))) {
-                    soundManager.playExplode();
-                    hud.addImpact();
+                    gameControl.aircraftExploded();
                     a.setImpact();
                     b.setImpact();
-                    newList.add(new FunctionalAircraft(dm, res));
+                    newList.add(new FunctionalAircraft( res,dm));
 
-                    // Vibrate for 300 milliseconds
-                    vibrator.vibrate(100);
 
                 }
             }
@@ -59,7 +55,7 @@ class AircraftsControl {
         aircrafts = newList;
         newaircraftimer += timer;
         if (newaircraftimer > 3000) {
-            aircrafts.add(new FunctionalAircraft(dm, res));
+            aircrafts.add(new FunctionalAircraft(res,dm));
             newaircraftimer = 0;
         }
 

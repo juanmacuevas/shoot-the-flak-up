@@ -1,5 +1,6 @@
 package com.juanmacuevas.shoottheflakup;
 
+import android.content.res.Resources;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -7,7 +8,7 @@ import android.util.DisplayMetrics;
 import androidx.core.util.Pair;
 
 
-public class FunctionalBullet implements Renderable{
+public class FunctionalBullet extends GraphicComponent{
 
 	private static final int STATUS_FLYING = 0;
 
@@ -31,12 +32,12 @@ public class FunctionalBullet implements Renderable{
 	private float iniSpeedY;
 	private final float tankBottom;
 	private Paint paint;
-	private final float scale;
 
 	private long explodingTimer;
 
 
-	public FunctionalBullet(int power, float angle, Pair<Integer, Integer> bulletOrigin, DisplayMetrics metrics){
+	public FunctionalBullet(Resources res, int power, float angle, Pair<Integer, Integer> bulletOrigin, DisplayMetrics metrics){
+		super(res,metrics);
 		time=0;
 		paint = new Paint();
 		posX0=bulletOrigin.first;
@@ -45,7 +46,6 @@ public class FunctionalBullet implements Renderable{
 		iniSpeedX=(float) (Math.cos(angle)*power*1.5);
 
 		this.tankBottom = metrics.heightPixels - (FuncionalTank.TANK_BOTTOM_MARGIN * Utils.scale(metrics));
-		scale = Utils.scale(metrics);
 
 	}
 

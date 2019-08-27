@@ -1,40 +1,34 @@
 package com.juanmacuevas.shoottheflakup;
 
 import android.content.res.Resources;
-import android.graphics.*;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Matrix;
 import android.util.DisplayMetrics;
 
-public class FunctionalAircraft implements Renderable {
+public class FunctionalAircraft extends GraphicComponent  {
 
 	private static final int STATUS_FLYING = 0;
-
 	private static final int STATUS_BOOM = 1;
-
 	private static final int STATUS_OVER = 2;
 
 	private static final float AIRCRAFT_WIDTH  = (float) (127*0.35);
-
 	private static final float AIRCRAFT_HEIGHT  = (float) (134*0.35);
 
-
 	private static final float TIME_FLYING = 5;
-
 	private static final long TIME_EXPLODING  = 800;
-	private final float scale;
 
-	private float lowerPosition;
-
-	private Bitmap aircraftImg;
-	private Bitmap aircraftDownImg;
-
-	private long time;
+	private static Bitmap aircraftImg;
+	private static Bitmap aircraftDownImg;
+	private Bitmap currentImg;
+	private long timeFlying;
 
 	private int status;
 	private float posX;
 	private float posY;
 	private double iniSpeedX;
 	private double iniSpeedY;
-	private float posX0;
+	private float initPointX;
 	private float posY0;
 
 	private float drawX;
@@ -42,108 +36,83 @@ public class FunctionalAircraft implements Renderable {
 
 	private int angle;
 
-	private int direction;
+	private int leftOrRight;
 	private float acceleration;
 
 	private long explodingTimer;
 
-	public FunctionalAircraft(DisplayMetrics dm,Resources res){
-		time=0;
-		status = STATUS_FLYING;
-		scale = Utils.scale(dm);
-		//random values
+	public FunctionalAircraft(Resources res, DisplayMetrics metrics) {
+		super(res, metrics);
 
-		direction = (Math.random()<0.5?1:-1);
+		timeFlying =0;
+        angle = 0;
+        status = STATUS_FLYING;
+        initValues(metrics);
 
-		posX0 = (float) (dm.widthPixels/2 + (dm.widthPixels*-direction*Math.random()));
+        aircraftImg = initBitmap(aircraftImg, R.drawable.aircraft, AIRCRAFT_WIDTH, AIRCRAFT_HEIGHT);
+        aircraftDownImg = initBitmap(aircraftDownImg, R.drawable.aircraftdown, AIRCRAFT_WIDTH, AIRCRAFT_HEIGHT);
+		currentImg = aircraftImg;
+	}
 
-		lowerPosition = dm.heightPixels;
+    private void initValues(DisplayMetrics metrics) {
+        //random values
+        leftOrRight = (Math.random()<0.5?1:-1);
+        initPointX = (float) (metrics.widthPixels/2 + (metrics.widthPixels*-this.leftOrRight *Math.random()));
+        int lowerPosition = metrics.heightPixels;
+        acceleration = (float) (lowerPosition/Math.pow(TIME_FLYING/2,2));
+        iniSpeedX = ( metrics.widthPixels / TIME_FLYING) ;
+        iniSpeedY=(TIME_FLYING*acceleration/2)-1/TIME_FLYING;
 
-		acceleration = (float) (lowerPosition/Math.pow(TIME_FLYING/2,2));
+    }
 
-		iniSpeedX = ( dm.widthPixels / TIME_FLYING) ;
+    public void draw(Canvas c) {
 
-		angle = 0;
-		iniSpeedY=(TIME_FLYING*acceleration/2)-1/TIME_FLYING;
-
-		initResources(res);
+	    Matrix m = matrixTranslateAndMove(drawX,drawY,angle,posX,posY);
+		c.drawBitmap(currentImg, m, null);
 
 	}
 
-	public void initResources(Resources res){
-        if (aircraftDownImg == null) {
-            aircraftDownImg = BitmapFactory.decodeResource(res, R.drawable.aircraftdown);
-            aircraftDownImg = Bitmap.createScaledBitmap(aircraftDownImg, (int) (AIRCRAFT_WIDTH * scale), (int) (AIRCRAFT_HEIGHT * scale), true);
+    public void update(long elapsedTime) {
+
+	    if (status == STATUS_FLYING){
+	        handleFlying(elapsedTime);
+        }else if (status == STATUS_BOOM) {
+            handleExploded(elapsedTime);
         }
-        if (aircraftImg == null) {
-            aircraftImg = BitmapFactory.decodeResource(res, R.drawable.aircraft);
-            aircraftImg = Bitmap.createScaledBitmap(aircraftImg, (int) (AIRCRAFT_WIDTH * scale), (int) (AIRCRAFT_HEIGHT * scale), true);
-        }
-
-
-
-	}
-	public void draw(Canvas c) {
-
-		Matrix m = new Matrix();
-		m.postTranslate(drawX, drawY);
-		m.postRotate(angle,posX,posY);
-
-		if (status == STATUS_FLYING)
-			c.drawBitmap(aircraftImg, m, null);
-		else if (status == STATUS_BOOM)
-			c.drawBitmap(aircraftDownImg, m, null);
-
-	}
-
-	public void update(long elapsedTime) {
-
-
-		double t2;
-		switch (status){
-		case STATUS_FLYING:
-			time+=elapsedTime;
-			t2=(double)(time)/1000;
-
-
-			posX = (float) (posX0 +  iniSpeedX*t2*direction);
-			posY = (float) (iniSpeedY * t2 - (acceleration/2 * Math.pow(t2,2) ));
-
-			angle = (direction>0?180:0)+   (int) (Math.atan((iniSpeedY-acceleration*t2)/iniSpeedX*direction)*180/Math.PI);
-
-			if (posY<0) status=STATUS_OVER;
-
-			break;
-
-		case STATUS_BOOM:
-			explodingTimer+=elapsedTime;
-
-			t2=(double)(explodingTimer)/1000;
-
-			posX = (float) (posX0 +  iniSpeedX*t2*direction);
-			posY = (float) (posY0 + iniSpeedY * t2 + (7.0/2 * Math.pow(t2,2) ));
-
-			if (explodingTimer>TIME_EXPLODING)
-				status=STATUS_OVER;
-			break;
-			default:
-		}
-
 		drawX = (float) (posX-(AIRCRAFT_WIDTH*0.375)* scale);
 		drawY = posY-(AIRCRAFT_HEIGHT/2)* scale;
 	}
 
 
+    private void handleFlying(long elapsedTime) {
+        timeFlying +=elapsedTime;
+        double timeFlyingSeconds=(double)(timeFlying)/1000;
+        posX = (float) (initPointX +  iniSpeedX*timeFlyingSeconds* leftOrRight);
+        posY = (float) (iniSpeedY * timeFlyingSeconds - (acceleration/2 * Math.pow(timeFlyingSeconds,2) ));
+        angle = (leftOrRight >0?180:0)+   (int) (Math.atan((iniSpeedY-acceleration*timeFlyingSeconds)/iniSpeedX* leftOrRight)*180/Math.PI);
+        if (posY<0) status=STATUS_OVER;
 
-	public boolean isOver() {
+	}
+    private void handleExploded(long elapsedTime) {
+        explodingTimer+=elapsedTime;
+        double  t2=(double)(explodingTimer)/1000;
+        posX = (float) (initPointX +  iniSpeedX*t2* leftOrRight);
+        posY = (float) (posY0 + iniSpeedY * t2 + (7.0/2 * Math.pow(t2,2) ));
+        if (explodingTimer>TIME_EXPLODING)
+            status=STATUS_OVER;
+    }
+
+
+    public boolean isOver() {
 		return (status==STATUS_OVER);
 	}
 
 	public void setImpact(){
 
 		status = STATUS_BOOM;
+		currentImg = aircraftDownImg;
 		explodingTimer=0;
-		posX0=posX;
+		initPointX =posX;
 		posY0=posY;
 		iniSpeedY=iniSpeedY-(acceleration*explodingTimer/1000);
 

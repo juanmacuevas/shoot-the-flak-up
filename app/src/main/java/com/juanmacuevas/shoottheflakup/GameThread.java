@@ -1,6 +1,7 @@
 package com.juanmacuevas.shoottheflakup;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.graphics.Canvas;
 import android.os.Vibrator;
 import android.util.DisplayMetrics;
@@ -10,10 +11,9 @@ import androidx.core.util.Pair;
 
 import java.util.concurrent.ArrayBlockingQueue;
 
-public class GameThread extends Thread {
+public class GameThread extends Thread implements GameEvents{
 
 	private final SoundManager soundManager;
-
 	private SurfaceHolder mSurfaceHolder;
 
 	private ArrayBlockingQueue<InputObject> inputQueue = new ArrayBlockingQueue<>(30);
@@ -35,25 +35,21 @@ public class GameThread extends Thread {
         readyToDraw = false;
         lastUpdateTime = 0;
 
-
-
 		soundManager = new SoundManager(context);
 		vibrator = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
 
-		tank = new FuncionalTank(metrics,this,context.getResources());
-		landscape = new Landscape(context.getResources(),metrics);
+		Resources res = context.getResources();
+		tank = new FuncionalTank(metrics,this,res);
+		landscape = new Landscape(res,metrics);
 		hud = new HUD(metrics);
 
-		bulletsControl = new BulletsControl(metrics);
-		aircraftsControl = new AircraftsControl(metrics,soundManager,context.getResources());
+		bulletsControl = new BulletsControl(res,metrics);
+		aircraftsControl = new AircraftsControl(res,metrics,this);
 		hud.register(tank);
 
 		mSurfaceHolder = surfaceView.getHolder();
 		surfaceView.setThread(this);
-
-
 	}
-
 
 	/**
 	 * Resumes from a pause.
@@ -65,8 +61,6 @@ public class GameThread extends Thread {
 		}
 
 	}
-
-
 
 	@Override
 	public void run() {
@@ -98,8 +92,6 @@ public class GameThread extends Thread {
 		}
 	}
 
-
-
 	/**
 	 * Used to signal the thread whether it should be running or not.
 	 * Passing true allows the thread to run; passing false will shut it
@@ -113,12 +105,6 @@ public class GameThread extends Thread {
 	}
 
 
-
-
-	/**
-	 * Draws the tank, bullets, planes, and background to the provided
-	 * Canvas.
-	 */
 	private void doDraw(Canvas canvas) {
 
 		landscape.draw(canvas);
@@ -132,7 +118,7 @@ public class GameThread extends Thread {
 	private void updatePhysics(long timer) {
 	    tank.update(timer);
 	    bulletsControl.update(timer);
-        aircraftsControl.update(timer,bulletsControl.iterable(),hud,vibrator);
+        aircraftsControl.update(timer,bulletsControl.iterable());
     }
 
 
@@ -150,13 +136,13 @@ public class GameThread extends Thread {
 				if (input.eventType == InputObject.EVENT_TYPE_TOUCH) {
 					processMotionEvent(input);
 				}
-
 				input.returnToPool();
 			}
 		}
 	}
 
 	private void processMotionEvent(InputObject input) {
+
 		if (input.action == InputObject.ACTION_TOUCH_DOWN) {
 			tank.pressFire();
 			tank.setTarget(input.x, input.y);
@@ -170,19 +156,28 @@ public class GameThread extends Thread {
 		}
 	}
 
-	public void shootBullet(float angle, int power,Pair<Integer, Integer> bulletOrigin) {
-
-        bulletsControl.addBullet(power, angle, bulletOrigin);
-		soundManager.playShoot();
-	}
-
 
 	public void pauseMusic() {
 		soundManager.pauseMusic();
 	}
 
-	public void playMovegun() {
+	@Override
+	public void shootBullet(float angle, int power,Pair<Integer, Integer> bulletOrigin) {
+
+		bulletsControl.addBullet(power, angle, bulletOrigin);
+		soundManager.playShoot();
+	}
+
+	@Override
+	public void angleChanged() {
 		soundManager.playMovegun();
 	}
 
+	@Override
+	public void aircraftExploded() {
+		soundManager.playExplode();
+		// Vibrate for 300 milliseconds
+		vibrator.vibrate(100);
+		hud.addImpact();
+	}
 }
