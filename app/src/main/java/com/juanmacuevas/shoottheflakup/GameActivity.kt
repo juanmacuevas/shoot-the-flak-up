@@ -34,5 +34,15 @@ class GameActivity : Activity() {
         game!!.setRunning(false)
     }
 
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        game?.gameData?.impacts?.let { outState.putInt("impacts", it) }
+    }
+
+    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
+        super.onRestoreInstanceState(savedInstanceState)
+        game?.gameData?.impacts=savedInstanceState.getInt("impacts",0)
+    }
+
 }
 

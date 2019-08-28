@@ -42,20 +42,24 @@ class SoundManager(context: Context) {
     }
 
     fun playShoot() {
-        sounds.play(shoot, 0.3f, 0.3f, 1, 0, 1f)
+        play(shoot, 0.3f)
     }
-
     fun playExplode() {
-        sounds.play(explode, 0.6f, 0.6f, 1, 0, 1f)
+        play(explode, 0.6f)
 
     }
 
     fun playMovegun() {
         if (!movegunPlaying) {
-            sounds.play(movegun, 1f, 1f, 1, 0, 1f)
+            play(movegun, 0.6f)
             movegunPlaying = true
             movegunTimer = 0
         }
+    }
+
+    private fun play(res:Int, vol:Float){
+        sounds.play(res,vol,vol,1,0,1f)
+
     }
 
 }

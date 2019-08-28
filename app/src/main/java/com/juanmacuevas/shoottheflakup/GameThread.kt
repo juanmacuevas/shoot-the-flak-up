@@ -12,7 +12,7 @@ class GameThread(context: Context, private val gameView: GameView, metrics: Disp
     private val soundManager = SoundManager(context)
     private val vibrator = context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
 
-    private val gameData = GameData()
+    val gameData = GameData()
 
     private val powerBar = PowerBar(metrics)
     private val infoText = InfoText(context.resources, metrics)
@@ -27,7 +27,7 @@ class GameThread(context: Context, private val gameView: GameView, metrics: Disp
     private var lastUpdateTime = 0L
 
     init {
-        gameView.setThread(this)
+        gameView.thread=this
     }
 
     override fun run() {
@@ -70,7 +70,7 @@ class GameThread(context: Context, private val gameView: GameView, metrics: Disp
         readyToDraw = b
     }
 
-    override fun shootBullet(angle: Float, power: Int, bulletOrigin: Pair<Int, Int>) {
+    override fun shootBullet(angle: Float, power: Int, bulletOrigin: Pair<Int, Int>?) {
         bulletsControl.addBullet(power, angle, bulletOrigin)
         soundManager.playShoot()
     }
