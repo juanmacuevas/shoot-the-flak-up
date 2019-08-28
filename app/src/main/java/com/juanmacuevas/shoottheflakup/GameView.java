@@ -56,14 +56,12 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 	}
 
 
-	public void draw() {
-	}
 
-	public Canvas getCanvas() {
-		return getHolder().lockCanvas();
-	}
-
-	public void unlockCanvas(Canvas c) {
+	public void doDraw(GameThread gameThread) {
+		Canvas c = getHolder().lockCanvas();
+		if (c != null) {
+			gameThread.doDraw(c);
+		}
 		if(hasActiveHolder) {
 			getHolder().unlockCanvasAndPost(c);
 		}

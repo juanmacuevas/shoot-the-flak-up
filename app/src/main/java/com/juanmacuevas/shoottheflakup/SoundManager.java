@@ -42,17 +42,19 @@ public class SoundManager {
 
 	public final void pauseMusic() {
 
-		if (musicTheme.isPlaying()) musicTheme.pause();
+		if (musicTheme.isPlaying()) {
+			musicTheme.stop();
+		}
 	}
 
 	public void playShoot() {
 
-		sounds.play(shoot, 1, 1, 1, 0, 1);
+		sounds.play(shoot, 0.3f, 0.3f, 1, 0, 1);
 	}
 
 	public void playExplode() {
 
-		sounds.play(explode, 1, 1, 1, 0, 1);
+		sounds.play(explode, 0.6f, 0.6f, 1, 0, 1);
 
 	}
 
@@ -62,11 +64,6 @@ public class SoundManager {
 			movegunPlaying = true;
 			movegunTimer=0;
 		}
-
-
-
-
-
 	}
 
 	public void update(long time){
@@ -79,9 +76,6 @@ public class SoundManager {
 			}
 
 		}
-
-
-
 	}
 
 }

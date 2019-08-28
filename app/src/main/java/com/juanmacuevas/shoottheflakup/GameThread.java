@@ -9,173 +9,177 @@ import androidx.core.util.Pair;
 
 import java.util.concurrent.ArrayBlockingQueue;
 
-public class GameThread extends Thread implements GameEvents{
+public class GameThread extends Thread implements GameEvents {
 
-	private final SoundManager soundManager;
-	private GameView gameView;
+    private final SoundManager soundManager;
+    private GameView gameView;
 
-	private ArrayBlockingQueue<InputObject> inputQueue = new ArrayBlockingQueue<>(30);
-	private Object inputQueueMutex = new Object();
+    private ArrayBlockingQueue<InputObject> inputQueue = new ArrayBlockingQueue<>(30);
+    private Object inputQueueMutex = new Object();
 
     private boolean readyToDraw;
 
-	private PowerBar powerBar;
-	private InfoText infoText;
-	private FuncionalTank tank;
+    private PowerBar powerBar;
+    private InfoText infoText;
+    private FuncionalTank tank;
 
-	private AircraftsControl aircraftsControl;
-	private long lastUpdateTime;
-	private Vibrator vibrator;
+    private AircraftsControl aircraftsControl;
+    private long lastUpdateTime;
+    private Vibrator vibrator;
     private BulletsControl bulletsControl;
-	private Landscape landscape;
+    private Landscape landscape;
 
-	private final GameData gameData = new GameData();
+    private final GameData gameData = new GameData();
 
-	public GameThread(Context context, GameView surfaceView, DisplayMetrics metrics) {
+    public GameThread(Context context, GameView surfaceView, DisplayMetrics metrics) {
         // get handles to some important objects
         readyToDraw = false;
         lastUpdateTime = 0;
 
-		soundManager = new SoundManager(context);
-		vibrator = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
+        soundManager = new SoundManager(context);
+        vibrator = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
 
-		Resources res = context.getResources();
-		tank = new FuncionalTank(metrics,this,res);
-		landscape = new Landscape(res,metrics);
-		powerBar = new PowerBar(metrics);
-		infoText = new InfoText(res,metrics);
+        Resources res = context.getResources();
+        tank = new FuncionalTank(metrics, this, res);
+        landscape = new Landscape(res, metrics);
+        powerBar = new PowerBar(metrics);
+        infoText = new InfoText(res, metrics);
 
-		bulletsControl = new BulletsControl(res,metrics);
-		aircraftsControl = new AircraftsControl(res,metrics,this);
-
-
-		gameView = surfaceView;
-		surfaceView.setThread(this);
-	}
-
-	/**
-	 * Resumes from a pause.
-	 */
-	public void unpause() {
-		// Move the real time clock up to now
-		synchronized (gameView) {
-			lastUpdateTime = System.currentTimeMillis() + 100;
-		}
-
-	}
-
-	@Override
-	public void run() {
-		while (readyToDraw) {
-			long currentTime = System.currentTimeMillis();
-			long delta = currentTime - lastUpdateTime;
-			lastUpdateTime = currentTime;
-			try {
-				processInput();
-			} catch (InterruptedException e) {
-			}
-			updatePhysics(delta);
-			soundManager.update(delta);
-			Canvas c = gameView.getCanvas();
-			if (c != null) {
-				doDraw(c);
-			}
-			gameView.unlockCanvas(c);
-		}
-	}
-
-	/**
-	 * Used to signal the thread whether it should be running or not.
-	 * Passing true allows the thread to run; passing false will shut it
-	 * down if it's already running. Calling start() after this was most
-	 * recently called with false will result in an immediate shutdown.
-	 *
-	 * @param b true to run, false to shut down
-	 */
-	public void setRunning(boolean b) {
-		readyToDraw = b;
-	}
+        bulletsControl = new BulletsControl(res, metrics);
+        aircraftsControl = new AircraftsControl(res, metrics, this);
 
 
-	private void doDraw(Canvas canvas) {
+        gameView = surfaceView;
+        surfaceView.setThread(this);
+    }
 
-		landscape.draw(canvas);
-        aircraftsControl.draw(canvas);
-        bulletsControl.draw(canvas);
-		tank.draw(canvas);
-		powerBar.draw(canvas);
-		infoText.draw(canvas);
+    /**
+     * Resumes from a pause.
+     */
+    public void unpause() {
+        // Move the real time clock up to now
+        synchronized (gameView) {
+            lastUpdateTime = System.currentTimeMillis() + 100;
+        }
 
-	}
+    }
 
-	private void updatePhysics(long timer) {
-	    tank.update(timer);
-	    bulletsControl.update(timer);
-        aircraftsControl.update(timer,bulletsControl.iterable());
+    @Override
+    public void run() {
+        while (readyToDraw) {
+            processInput();
+            long delta = updateCurrentTimeAndCalculateDelta();
+            updatePhysics(delta);
+            soundManager.update(delta);
+            gameView.doDraw(this);
+        }
+        pauseMusic();
+    }
 
-        gameData.setPower(tank.getPower());
+    private long updateCurrentTimeAndCalculateDelta() {
+        long currentTime = System.currentTimeMillis();
+        long delta = currentTime - lastUpdateTime;
+        lastUpdateTime = currentTime;
+        return delta;
+    }
 
-		powerBar.setData(gameData);
-		infoText.setData(gameData);
+    /**
+     * Used to signal the thread whether it should be running or not.
+     * Passing true allows the thread to run; passing false will shut it
+     * down if it's already running. Calling start() after this was most
+     * recently called with false will result in an immediate shutdown.
+     *
+     * @param b true to run, false to shut down
+     */
+    public void setRunning(boolean b) {
+        readyToDraw = b;
     }
 
 
-	public void feedInput(InputObject input) throws InterruptedException {
-		synchronized(inputQueueMutex) {
-				inputQueue.put(input);
-		}
-	}
+    public void doDraw(Canvas canvas) {
 
-	private void processInput() throws InterruptedException {
-		synchronized (inputQueueMutex) {
-			while (!inputQueue.isEmpty()) {
-				InputObject input = inputQueue.take();
+        landscape.draw(canvas);
+        aircraftsControl.draw(canvas);
+        bulletsControl.draw(canvas);
+        tank.draw(canvas);
+        powerBar.draw(canvas);
+        infoText.draw(canvas);
 
-				if (input.eventType == InputObject.EVENT_TYPE_TOUCH) {
-					processMotionEvent(input);
-				}
-				input.returnToPool();
-			}
-		}
-	}
+    }
 
-	private void processMotionEvent(InputObject input) {
+    private void updatePhysics(long timer) {
+        tank.update(timer);
+        bulletsControl.update(timer);
+        aircraftsControl.update(timer, bulletsControl.iterable());
 
-		if (input.action == InputObject.ACTION_TOUCH_DOWN) {
-			tank.pressFire();
-			tank.setTarget(input.x, input.y);
+        gameData.setPower(tank.getPower());
 
-		} else if (input.action == InputObject.ACTION_TOUCH_MOVE) {
-			tank.setTarget(input.x, input.y);
-
-		} else if (input.action == InputObject.ACTION_TOUCH_UP) {
-			tank.setTarget(input.x, input.y);
-			tank.releaseFire();
-		}
-	}
+        powerBar.setData(gameData);
+        infoText.setData(gameData);
+    }
 
 
-	public void pauseMusic() {
-		soundManager.pauseMusic();
-	}
+    public void feedInput(InputObject input) throws InterruptedException {
+        synchronized (inputQueueMutex) {
+            inputQueue.put(input);
+        }
+    }
 
-	@Override
-	public void shootBullet(float angle, int power,Pair<Integer, Integer> bulletOrigin) {
+    private void processInput() {
+        synchronized (inputQueueMutex) {
+            while (!inputQueue.isEmpty()) {
+                InputObject input = null;
+                try {
+                    input = inputQueue.take();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
 
-		bulletsControl.addBullet(power, angle, bulletOrigin);
-		soundManager.playShoot();
-	}
+                if (input.eventType == InputObject.EVENT_TYPE_TOUCH) {
+                    processMotionEvent(input);
+                }
+                input.returnToPool();
+            }
+        }
+    }
 
-	@Override
-	public void angleChanged(float angle) {
-		gameData.setAngle(angle);
-		soundManager.playMovegun();
-	}
+    private void processMotionEvent(InputObject input) {
 
-	@Override
-	public void aircraftExploded() {
-		gameData.setImpacts(gameData.getImpacts()+1);
-		soundManager.playExplode();
-		vibrator.vibrate(100);
-	}
+        if (input.action == InputObject.ACTION_TOUCH_DOWN) {
+            tank.pressFire();
+            tank.setTarget(input.x, input.y);
+
+        } else if (input.action == InputObject.ACTION_TOUCH_MOVE) {
+            tank.setTarget(input.x, input.y);
+
+        } else if (input.action == InputObject.ACTION_TOUCH_UP) {
+            tank.setTarget(input.x, input.y);
+            tank.releaseFire();
+        }
+    }
+
+
+    private void pauseMusic() {
+        soundManager.pauseMusic();
+    }
+
+    @Override
+    public void shootBullet(float angle, int power, Pair<Integer, Integer> bulletOrigin) {
+
+        bulletsControl.addBullet(power, angle, bulletOrigin);
+        soundManager.playShoot();
+    }
+
+    @Override
+    public void angleChanged(float angle) {
+        gameData.setAngle(angle);
+        soundManager.playMovegun();
+    }
+
+    @Override
+    public void aircraftExploded() {
+        gameData.setImpacts(gameData.getImpacts() + 1);
+        soundManager.playExplode();
+        vibrator.vibrate(100);
+    }
 }
