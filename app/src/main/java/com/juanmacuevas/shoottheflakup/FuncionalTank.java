@@ -111,9 +111,9 @@ public class FuncionalTank extends GraphicComponent {
     }
 
     /**
-     * called when the user press the screen. It starts the powering process
+     * called when the user press the screen. It starts the powering addNewEvent
      */
-    public void pressFire() {
+    public void initFiring() {
         tankStatus = STATUS_POWERING;
         power = 0;
         milisecondsPowering = 0;
@@ -122,7 +122,7 @@ public class FuncionalTank extends GraphicComponent {
     /**
      * called when the user release the finger and the shoot is performed
      */
-    public void releaseFire() {
+    public void doFire() {
         thread.shootBullet(angle, 60 + power * 60 / 100, bulletOrigin);
         lastBulletPower = power;
         tankStatus = STATUS_IDLE;

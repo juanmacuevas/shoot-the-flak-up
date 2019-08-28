@@ -32,11 +32,6 @@ public class InfoText extends GraphicComponent{
         paint.setAntiAlias(true);
         paint.setTextSize(TEXT_SIZE*scale);
 
-////        int powerInfo=(tank.getPower()==0?tank.getLastBulletPower():tank.getPower());
-//        c.drawText("Angle: "+(int) (tank.getAngle()*180/Math.PI)+"°", TEXT_INFO_LEFT_MARGIN * scale, TEXT_ANGLE_TOP_MARGIN * scale, paint);
-//        c.drawText("Power: "+powerInfo, TEXT_INFO_LEFT_MARGIN * scale, TEXT_POWER_TOP_MARGIN * scale, paint);
-//        c.drawText("Impacts: "+impactCounter, TEXT_INFO_LEFT_MARGIN * scale, TEXT_COUNTER_TOP_MARGIN * scale, paint);
-
         c.drawText("Angle: "+angle+"°", TEXT_INFO_LEFT_MARGIN * scale, TEXT_ANGLE_TOP_MARGIN * scale, paint);
         c.drawText("Power: "+power, TEXT_INFO_LEFT_MARGIN * scale, TEXT_POWER_TOP_MARGIN * scale, paint);
         c.drawText("Impacts: "+impacts, TEXT_INFO_LEFT_MARGIN * scale, TEXT_COUNTER_TOP_MARGIN * scale, paint);

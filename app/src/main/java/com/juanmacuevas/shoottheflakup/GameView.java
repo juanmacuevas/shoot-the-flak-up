@@ -57,7 +57,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
 
 
-	public void doDraw(GameThread gameThread) {
+	public void prepareCanvasAndDraw(GameThread gameThread) {
 		Canvas c = getHolder().lockCanvas();
 		if (c != null) {
 			gameThread.doDraw(c);
