@@ -5,8 +5,6 @@ import android.content.res.Resources;
 import android.graphics.Canvas;
 import android.os.Vibrator;
 import android.util.DisplayMetrics;
-import android.util.Log;
-import android.view.SurfaceHolder;
 import androidx.core.util.Pair;
 
 import java.util.concurrent.ArrayBlockingQueue;
@@ -14,7 +12,7 @@ import java.util.concurrent.ArrayBlockingQueue;
 public class GameThread extends Thread implements GameEvents{
 
 	private final SoundManager soundManager;
-	private SurfaceHolder mSurfaceHolder;
+	private GameView gameView;
 
 	private ArrayBlockingQueue<InputObject> inputQueue = new ArrayBlockingQueue<>(30);
 	private Object inputQueueMutex = new Object();
@@ -51,7 +49,7 @@ public class GameThread extends Thread implements GameEvents{
 		aircraftsControl = new AircraftsControl(res,metrics,this);
 
 
-		mSurfaceHolder = surfaceView.getHolder();
+		gameView = surfaceView;
 		surfaceView.setThread(this);
 	}
 
@@ -60,7 +58,7 @@ public class GameThread extends Thread implements GameEvents{
 	 */
 	public void unpause() {
 		// Move the real time clock up to now
-		synchronized (mSurfaceHolder) {
+		synchronized (gameView) {
 			lastUpdateTime = System.currentTimeMillis() + 100;
 		}
 
@@ -69,30 +67,20 @@ public class GameThread extends Thread implements GameEvents{
 	@Override
 	public void run() {
 		while (readyToDraw) {
-			Canvas c = null;
+			long currentTime = System.currentTimeMillis();
+			long delta = currentTime - lastUpdateTime;
+			lastUpdateTime = currentTime;
 			try {
-				c = mSurfaceHolder.lockCanvas(null);
-				synchronized (mSurfaceHolder) {
-					long currentTime = System.currentTimeMillis();
-					long delta = currentTime - lastUpdateTime;
-					lastUpdateTime = currentTime;
-					processInput();
-					updatePhysics(delta);
-					soundManager.update(delta);
-					if (c!=null) {
-                        doDraw(c);
-                    }
-				}
+				processInput();
 			} catch (InterruptedException e) {
-				Log.d("GameThread",e.getMessage());
-			} finally {
-				// do this in a finally so that if an exception is thrown
-				// during the above, we don't leave the Surface in an
-				// inconsistent state
-				if (c != null) {
-					mSurfaceHolder.unlockCanvasAndPost(c);
-				}
 			}
+			updatePhysics(delta);
+			soundManager.update(delta);
+			Canvas c = gameView.getCanvas();
+			if (c != null) {
+				doDraw(c);
+			}
+			gameView.unlockCanvas(c);
 		}
 	}
 

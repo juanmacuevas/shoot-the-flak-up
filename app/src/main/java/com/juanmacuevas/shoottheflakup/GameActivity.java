@@ -1,6 +1,7 @@
 package com.juanmacuevas.shoottheflakup;
 
 import android.app.Activity;
+import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -16,20 +17,20 @@ public class GameActivity extends Activity {
     private GameThread mGameThread;
 
     @Override
-    protected void onStart() {
-        super.onStart();
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.main);
 
         final DisplayMetrics metrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(metrics);
-
         GameView gameSurfaceView = findViewById(R.id.game);
 
         mGameThread = new GameThread(this, gameSurfaceView, metrics);
 
         createInputObjectPool();
     }
+
 
     private void createInputObjectPool() {
         for (int i = 0; i < INPUT_QUEUE_SIZE; i++) {

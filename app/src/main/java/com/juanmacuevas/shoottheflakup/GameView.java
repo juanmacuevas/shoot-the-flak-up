@@ -1,6 +1,7 @@
 package com.juanmacuevas.shoottheflakup;
 
 import android.content.Context;
+import android.graphics.Canvas;
 import android.util.AttributeSet;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -8,6 +9,7 @@ import android.view.SurfaceView;
 public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
 	private GameThread thread;
+	private boolean hasActiveHolder=false;
 
 	public GameView(Context context, AttributeSet attrs) {
 		super(context, attrs);
@@ -35,6 +37,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 		// waiting for the surface to be created
 		thread.setRunning(true);
 		thread.start();
+		hasActiveHolder=true;
 	}
 
 	public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
@@ -48,12 +51,23 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 	public void surfaceDestroyed(SurfaceHolder holder) {
 		// we have to tell thread to shut down & wait for it to finish, or else
 		// it might touch the Surface after we return and explode
-
+		hasActiveHolder = false;
 		thread.setRunning(false);
 	}
 
 
+	public void draw() {
+	}
 
+	public Canvas getCanvas() {
+		return getHolder().lockCanvas();
+	}
+
+	public void unlockCanvas(Canvas c) {
+		if(hasActiveHolder) {
+			getHolder().unlockCanvasAndPost(c);
+		}
+	}
 }
 
 
