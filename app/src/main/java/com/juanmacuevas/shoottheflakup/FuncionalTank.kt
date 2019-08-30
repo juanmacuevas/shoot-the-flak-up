@@ -8,24 +8,24 @@ import androidx.core.util.Pair
 
 class FuncionalTank(metrics: DisplayMetrics, thread: GameThread, res: Resources) : GraphicComponent(res, metrics) {
 
-    private val thread: GameEvents
+    private val thread = thread
     private val shootOriginX: Float
     private val shootOriginY: Float
-    private val tankLeft: Float
-    private val tankTop: Float
-
-    private var tankStatus: Int = 0
-    private var milisecondsPowering: Long = 0
-    private var bulletOrigin: Pair<Int, Int>? = null
     val TANK_BOTTOM_MARGIN = 7
     val TANK_LEFT_MARGIN = 0
     val TANK_HEIGHT = 55
-    val TANK_WIDTH = 106
-
-    val GUNBARREL_LENGTH = 100
-    val GUNBARREL_WIDTH = 23
+    private val tankLeft= TANK_LEFT_MARGIN * scale
+    private val tankTop = metrics.heightPixels - (TANK_HEIGHT + TANK_BOTTOM_MARGIN) * scale
 
     val STATUS_IDLE = 0
+    private var tankStatus=STATUS_IDLE
+    private var milisecondsPowering = 0L
+    private var bulletOrigin: Pair<Int, Int>? = null
+
+    val TANK_WIDTH = 106
+    val GUNBARREL_LENGTH = 100
+
+    val GUNBARREL_WIDTH = 23
     val STATUS_POWERING = 1
     val POWERING_TIMER_LIMIT: Long = 1200
 
@@ -36,17 +36,12 @@ class FuncionalTank(metrics: DisplayMetrics, thread: GameThread, res: Resources)
     }
 
     private var angle: Float = 0.toFloat()
-    var power: Int = 0
-    private var lastBulletPower: Int = 0
+    var power = 0
+    private var lastBulletPower= 0
 
     init {
-        this.thread = thread
-        tankStatus = STATUS_IDLE
-        power = 0
-        lastBulletPower = 0
-        milisecondsPowering = 0
-        tankLeft = TANK_LEFT_MARGIN * scale
-        tankTop = metrics.heightPixels - (TANK_HEIGHT + TANK_BOTTOM_MARGIN) * scale
+
+        tankTop
         shootOriginX = TANK_LEFT_MARGIN + 60f * scale
         shootOriginY = tankTop + 12 * scale
         setTarget(metrics.widthPixels, 0)
@@ -79,15 +74,10 @@ class FuncionalTank(metrics: DisplayMetrics, thread: GameThread, res: Resources)
 
     }
 
-    /**
-     * Sets the gun barrel to point the specified coordinate
-     *
-     * @param x
-     * @param y
-     */
-    fun setTarget(x: Int, y: Int) {
-        var x = x
-        var y = y
+
+    fun setTarget(px: Int, py: Int) {
+        var x = px
+        var y = py
         if (x < shootOriginX) x = shootOriginX.toInt()
         if (y > shootOriginY) y = shootOriginY.toInt()
         if (x.toFloat() == shootOriginX && y.toFloat() == shootOriginY) x = x + 10

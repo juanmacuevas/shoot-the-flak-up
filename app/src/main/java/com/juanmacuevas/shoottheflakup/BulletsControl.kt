@@ -8,18 +8,13 @@ import androidx.core.util.Pair
 import java.util.ArrayList
 
 internal class BulletsControl(private val res: Resources, private val metrics: DisplayMetrics) {
-    private val bullets: ArrayList<FunctionalBullet>
-
-    init {
-        bullets = ArrayList()
-
-    }
+    private val bullets = ArrayList<FunctionalBullet>()
 
     fun draw(canvas: Canvas) {
         val it = bullets.iterator()
         while (it.hasNext()) {
             val b = it.next()
-            b?.draw(canvas)
+            b.draw(canvas)
         }
 
     }

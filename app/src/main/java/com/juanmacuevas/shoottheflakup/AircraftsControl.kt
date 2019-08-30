@@ -8,15 +8,11 @@ import java.util.ArrayList
 
 internal class AircraftsControl(
     private val res: Resources,
-    private val dm: DisplayMetrics,
+    private val metrics: DisplayMetrics,
     private val gameControl: GameEvents) {
 
-    private var aircrafts= ArrayList<FunctionalAircraft>()
-    private var newaircraftimer = 0L
-
-    init {
-        FunctionalAircraft(res, dm)
-    }
+    private var aircrafts = ArrayList<FunctionalAircraft>()
+    private var newAircraftTimer = 0L
 
     fun draw(canvas: Canvas) {
         val it = aircrafts!!.iterator()
@@ -37,7 +33,7 @@ internal class AircraftsControl(
                     gameControl.aircraftExploded()
                     a.setImpact()
                     b.setImpact()
-                    newList.add(FunctionalAircraft(res, dm))
+                    newList.add(FunctionalAircraft(res, metrics))
 
 
                 }
@@ -46,10 +42,10 @@ internal class AircraftsControl(
 
         }
         aircrafts = newList
-        newaircraftimer += timer
-        if (newaircraftimer > 3000) {
-            aircrafts!!.add(FunctionalAircraft(res, dm))
-            newaircraftimer = 0
+        newAircraftTimer += timer
+        if (newAircraftTimer > 3000) {
+            aircrafts!!.add(FunctionalAircraft(res, metrics))
+            newAircraftTimer = 0
         }
 
     }

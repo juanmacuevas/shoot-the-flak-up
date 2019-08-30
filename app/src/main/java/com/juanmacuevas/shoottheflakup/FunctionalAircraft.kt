@@ -3,7 +3,6 @@ package com.juanmacuevas.shoottheflakup
 import android.content.res.Resources
 import android.graphics.Bitmap
 import android.graphics.Canvas
-import android.graphics.Matrix
 import android.util.DisplayMetrics
 
 class FunctionalAircraft(res: Resources, metrics: DisplayMetrics) : GraphicComponent(res, metrics) {
@@ -11,12 +10,13 @@ class FunctionalAircraft(res: Resources, metrics: DisplayMetrics) : GraphicCompo
     private val STATUS_FLYING = 0
     private val STATUS_BOOM = 1
     private val STATUS_OVER = 2
-
+    val impactPrecision = 22
     private val AIRCRAFT_WIDTH = (127 * 0.35).toFloat()
     private val AIRCRAFT_HEIGHT = (134 * 0.35).toFloat()
 
-    private val TIME_FLYING = 5f
+    private val TIME_FLYING = 4f + Math.random()*4 //5f
     private val TIME_EXPLODING: Long = 800
+
     companion object {
         private var aircraftImg: Bitmap? = null
         private var aircraftDownImg: Bitmap? = null
@@ -25,24 +25,21 @@ class FunctionalAircraft(res: Resources, metrics: DisplayMetrics) : GraphicCompo
     private var currentImg: Bitmap? = null
     private var timeFlying: Long = 0
 
-    private var status: Int = 0
+    private var status: Int = STATUS_FLYING
     private var posX: Float = 0.toFloat()
     private var posY: Float = 0.toFloat()
-    private var iniSpeedX: Double = 0.toDouble()
-    private var iniSpeedY: Double = 0.toDouble()
-    private var initPointX: Float = 0.toFloat()
     private var posY0: Float = 0.toFloat()
 
-    private var drawX: Float = 0.toFloat()
-    private var drawY: Float = 0.toFloat()
+    private var leftOrRight = if (Math.random() < 0.5) 1 else -1
+    private var initPointX = (metrics.widthPixels / 2 + metrics.widthPixels.toDouble() * (-this.leftOrRight).toDouble() * Math.random()).toFloat()
+    private var acceleration = (metrics.heightPixels / Math.pow((TIME_FLYING / 2).toDouble(), 2.0)).toFloat()
+    private var iniSpeedX: Double = (metrics.widthPixels / TIME_FLYING).toDouble()
+    private var iniSpeedY: Double =(TIME_FLYING * acceleration / 2 - 1 / TIME_FLYING).toDouble()
 
+    private var drawX = 0.toFloat()
+    private var drawY = 0.toFloat()
     private var angle: Int = 0
-
-    private var leftOrRight: Int = 0
-    private var acceleration: Float = 0.toFloat()
-
     private var explodingTimer: Long = 0
-
 
     val isOver: Boolean
         get() = status == STATUS_OVER
@@ -51,31 +48,17 @@ class FunctionalAircraft(res: Resources, metrics: DisplayMetrics) : GraphicCompo
         get() = status == STATUS_FLYING
 
     init {
-
-        timeFlying = 0
-        angle = 0
-        status = STATUS_FLYING
-        initValues(metrics)
-
         Companion.aircraftImg = initBitmap(Companion.aircraftImg, R.drawable.aircraft, AIRCRAFT_WIDTH, AIRCRAFT_HEIGHT)
-        Companion.aircraftDownImg = initBitmap(Companion.aircraftDownImg, R.drawable.aircraftdown, AIRCRAFT_WIDTH, AIRCRAFT_HEIGHT)
+        Companion.aircraftDownImg =
+            initBitmap(Companion.aircraftDownImg, R.drawable.aircraftdown, AIRCRAFT_WIDTH, AIRCRAFT_HEIGHT)
         currentImg = aircraftImg
     }
 
-    private fun initValues(metrics: DisplayMetrics) {
-        //random values
-        leftOrRight = if (Math.random() < 0.5) 1 else -1
-        initPointX =
-            (metrics.widthPixels / 2 + metrics.widthPixels.toDouble() * (-this.leftOrRight).toDouble() * Math.random()).toFloat()
-        val lowerPosition = metrics.heightPixels
-        acceleration = (lowerPosition / Math.pow((TIME_FLYING / 2).toDouble(), 2.0)).toFloat()
-        iniSpeedX = (metrics.widthPixels / TIME_FLYING).toDouble()
-        iniSpeedY = (TIME_FLYING * acceleration / 2 - 1 / TIME_FLYING).toDouble()
-
-    }
 
     override fun draw(c: Canvas) {
-
+        if (drawX.equals(0.toFloat())) {
+            return
+        }
         val m = matrixTranslateAndMove(drawX, drawY, angle.toFloat(), posX, posY)
         c.drawBitmap(currentImg!!, m, null)
 
@@ -125,17 +108,12 @@ class FunctionalAircraft(res: Resources, metrics: DisplayMetrics) : GraphicCompo
 
     }
 
+
     fun impactDetected(b: FunctionalBullet): Boolean {
-        var impact = false
         val diffX = Math.abs(posX - b.posX)
         val diffY = Math.abs(posY - b.posY)
-        if (diffX < 19 && diffY < 19 * scale) {
-            impact = true
-        } else
-            impact = false
-        return impact
+        return  diffX < impactPrecision * scale && diffY < impactPrecision * scale
     }
-
 
 
 }
